@@ -19,17 +19,24 @@ const authClient = new OAuth2Client(googleClientId, googleClientSecret, googleRe
 
 function buildAuthUrl() {
   const authEndpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
+
+  // 确保所有环境变量都有值，或提供默认值
+  const clientId = googleClientId || 'default-client-id';
+  const redirectUri = googleRedirectUri || 'default-redirect-uri';
+  const scopes = googleScopes || 'default-scopes';
+
   const queryParams = new URLSearchParams({
     access_type: 'offline', 
-    client_id: googleClientId, // 使用环境变量
+    client_id: clientId,
     prompt: 'consent',
-    redirect_uri: googleRedirectUri, // 使用环境变量
+    redirect_uri: redirectUri,
     response_type: 'code',
-    scope: googleScopes // 使用环境变量
+    scope: scopes
   });
 
   return `${authEndpoint}?${queryParams.toString()}`;
 }
+
 
 
 app.use(async (req, res) => {
