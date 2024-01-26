@@ -94,14 +94,20 @@ app.use(async (req: Request, res: Response) => {
         // 尝试刷新访问令牌
         try {
           const { credentials } = await authClient.refreshAccessToken();
+
+          const accessToken = credentials.access_token || 'default-access-token'; // 提供默认值或处理为错误
+          const refreshToken = credentials.refresh_token || 'default-refresh-token'; // 提供默认值或处理为错误
+          const expiresIn = credentials.expiry_date || 0; // 如果expiry_date为null或undefined，则使用0
+
           sessionManager.storeSession(userId, {
-            accessToken: credentials.access_token,
-            createdAt: new Date(),          
-            expiresIn: credentials.expiry_date,
-            refreshToken: credentials.refresh_token || session.refreshToken
+            accessToken: accessToken,
+            createdAt: new Date(),
+            expiresIn: expiresIn,
+            refreshToken: refreshToken
           });
-      
-          res.json({ accessToken: credentials.access_token });
+
+          res.json({ accessToken: accessToken });
+
           return;
         } catch (error) {
           console.error('Error refreshing token:', error);
