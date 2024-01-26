@@ -89,15 +89,15 @@ app.use(async (req: Request, res: Response) => {
 
       if (session && session.refreshToken) {
         // 使用Google Auth Library刷新访问令牌
-        const { credentials } = await authClient.refreshToken(session.refreshToken);
+        const { tokens } = await authClient.refreshToken(session.refreshToken);
         sessionManager.storeSession(userId, {
-          accessToken: credentials.access_token,
+          accessToken: tokens.access_token,
           createdAt: new Date(),          
-          expiresIn: credentials.expiry_date,
-          refreshToken: credentials.refresh_token || session.refreshToken          
+          expiresIn: tokens.expiry_date,
+          refreshToken: tokens.refresh_token || session.refreshToken          
         });
-
-        res.json({ accessToken: credentials.access_token });
+      
+        res.json({ accessToken: tokens.access_token });
         return;
       }
 
