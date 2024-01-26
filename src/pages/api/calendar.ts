@@ -70,8 +70,6 @@ app.use(async (req: Request, res: Response) => {
           refreshToken: refreshToken
         });
 
-
-
         // 返回成功消息
         res.json({ message: 'Authentication successful' });
         return;
@@ -107,11 +105,6 @@ app.use(async (req: Request, res: Response) => {
         return;
       }
       
-      
-        res.json({ accessToken: tokens.access_token });
-        return;
-      }
-
       res.status(400).json({ error: 'Refresh token missing or invalid' });
       return;
     } else if (req.method === 'POST') {
