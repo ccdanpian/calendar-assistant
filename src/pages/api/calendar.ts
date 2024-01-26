@@ -56,12 +56,16 @@ app.use(async (req: Request, res: Response) => {
 
         // 存储用户会话
         const userId = '12345'; // 这里需要逻辑来确定用户ID
+        const accessToken = tokens.access_token || 'no-access-token'; // 提供默认值或处理为错误
+        const refreshToken = tokens.refresh_token || 'no-refresh-token'; // 提供默认值或处理为错误
+
         sessionManager.storeSession(userId, {
-          accessToken: tokens.access_token,      
+          accessToken: accessToken,
           createdAt: new Date(),
-          expiresIn: tokens.expiry_date,
-          refreshToken: tokens.refresh_token
+          expiresIn: tokens.expiry_date, // 假设这是一个数字或undefined
+          refreshToken: refreshToken
         });
+
 
         // 返回成功消息
         res.json({ message: 'Authentication successful' });
