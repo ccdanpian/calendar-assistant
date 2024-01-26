@@ -25,16 +25,16 @@ function convertToRunnerArgs(data) {
 
   return {
     action: action,    
+    description: description,
     end: {
       dateTime: endDateTime ? endDateTime : undefined,
       timeZone: 'Asia/Shanghai',
     },
+    eventId: eventId,
     start: {
       dateTime: startDateTime ? startDateTime : undefined,
       timeZone: 'Asia/Shanghai',    
-    },    
-    description: description,
-    eventId: eventId,
+    },  
     subject: subject,
   };
 }

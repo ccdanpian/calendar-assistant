@@ -110,9 +110,9 @@ app.use(async (req, res) => {
           try {
             // 使用Google Auth Library刷新令牌
             const refreshResponse = await fetch('http://localhost:3400/api/calendar', { //这个URL应该指向您的googleAuth路由
-              method: 'POST',
+              body: JSON.stringify({ refreshToken: session.refreshToken }),
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ refreshToken: session.refreshToken })
+              method: 'POST'
             });
 
             if (!refreshResponse.ok) {
