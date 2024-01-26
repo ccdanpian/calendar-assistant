@@ -1,0 +1,53 @@
+{
+  "$schema": "../node_modules/@lobehub/chat-plugin-sdk/schema.json",
+  "api": [
+    {
+      "url": "https://bug-free-trout-rjrvv49vg753p55x-3400.app.github.dev/api/calendar",
+      "name": "manageEvents",
+      "description": "管理用户的日程事件，包括添加、查询、更新和删除，并给出日历地址",
+      "parameters": {
+        "properties": {
+          "action": {
+            "description": "要执行的操作，如添加（add）、查询（list）、更新（update）、删除（delete）",
+            "enum": ["add", "list", "update", "delete"],
+            "type": "string"
+          },
+          "startDateTime": {
+            "description": "用户给出的日程开始日期和时间; 在执行'add'或'list'时，需询问用户获取；当执行'delete'时, 如果用户未指定时,用2020年1月1号0点的时间替代; 使用格式为{'YYYY-MM-DDTHH:mm:ss.SSSZ' }",
+            "type": "string"
+          },
+          "endDateTime": {
+            "description": "用户给出的日程结束日期和时间; 在执行'add'或'list'时，需询问用户获取； 当执行'delete'时, 如果用户未指定时,用2030年的12月31号24点替代; 使用格式为{'YYYY-MM-DDTHH:mm:ss.SSSZ' }",
+            "type": "string"
+          },
+          "eventDetails": {
+            "description": "根据用户给出的信息总结出日程详细信息",
+            "type": "string"
+          },
+          "eventSummary": {
+            "description": "用户给出的日程的标题, 当用户没有指定时,询问用户",
+            "type": "string"
+          },
+          "eventId": {
+            "description": "日程的ID, 用于对'指定的日程'进行更新或删除; 当执行'delete'时, 如果上下文中没有'eventiD', 通过用户给出eventDetails查询得到",
+            "type": "string"
+          }
+        },
+        "required": ["action"],
+        "type": "object",
+        "description": "执行'add'或'list'时，要带上开始时间('startDateTime')和结束时间('endDateTime')，以及时间详细信息('eventDetails'); 执行'delete'的时候, 要带上'eventId '"
+      }
+    }
+  ],
+  "author": "cc",
+  "createdAt": "2024-01-08",
+  "homepage": "https://github.com/your-github-repo",
+  "identifier": "calendar-assistant",
+  "meta": {
+    "avatar": "📅",
+    "tags": ["calendar", "assistant", "schedule"],
+    "title": "Calendar Assistant",
+    "description": "A plugin to manage your calendar events"
+  },
+  "version": "1"
+}
