@@ -59,12 +59,17 @@ app.use(async (req: Request, res: Response) => {
         const accessToken = tokens.access_token || 'no-access-token'; // 提供默认值或处理为错误
         const refreshToken = tokens.refresh_token || 'no-refresh-token'; // 提供默认值或处理为错误
 
+        const expiresIn = tokens.expiry_date || 0; // 如果expiry_date为null或undefined，则使用0
+        // 或者，如果您不想在null时赋值，可以使用条件运算符
+        // const expiresIn = tokens.expiry_date != null ? tokens.expiry_date : undefined;
+
         sessionManager.storeSession(userId, {
           accessToken: accessToken,
           createdAt: new Date(),
-          expiresIn: tokens.expiry_date, // 假设这是一个数字或undefined
+          expiresIn: expiresIn, // 使用处理过的值
           refreshToken: refreshToken
         });
+
 
 
         // 返回成功消息
