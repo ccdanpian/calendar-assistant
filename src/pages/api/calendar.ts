@@ -5,6 +5,8 @@ import { runner } from './_utils'; // 假设这是处理日历操作的函数
 
 const express = require('express');
 
+import express, { Request, Response } from 'express';
+
 const app = express();
 app.use(express.json());
 
@@ -39,7 +41,7 @@ function buildAuthUrl() {
 
 
 
-app.use(async (req, res) => {
+app.use(async (req: Request, res: Response) => {
   try {
     if (req.path === '/api/calendar' && req.method === 'GET') {
       // ... googleAuth.ts 中的 GET 请求处理逻辑 ...
