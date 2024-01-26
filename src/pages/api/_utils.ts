@@ -67,9 +67,7 @@ async function listEvents(client, searchParams) {
       calendarId: 'primary',
       q: q,
       timeMax: formattedTimeMax,
-      timeMin: formattedTimeMin      
-      // singleEvents: true,
-      //orderBy: 'startTime'
+      timeMin: formattedTimeMin,
     });
     return events.data.items;
   } catch (error) {
