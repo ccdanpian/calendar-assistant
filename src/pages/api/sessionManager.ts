@@ -1,9 +1,9 @@
 // Define the structure of a user session
 interface Session {
-  accessToken: string;
-  refreshToken?: string;
-  expiresIn?: number;
+  accessToken: string;  
   createdAt: Date;
+  expiresIn?: number;
+  refreshToken?: string;
 }
 
 // Class for managing user sessions
@@ -29,7 +29,7 @@ class SessionManager {
     console.log(`Geted session for user ${userId}`, session);
     if (!session) {
       console.log(`No session found for user ${userId}`);
-      return null;
+      return undefined;
     }
     return session;
   }
