@@ -132,9 +132,10 @@ export async function runner(rawArgs: any, userId: string) {
     console.log(`Executing action: ${args.action}`, args);
 
     switch (args.action) {
-      case 'add':      
+      case 'add': {
         return await addEvent(client, args);
-      case 'list':
+      }
+      case 'list': {
         // 假设 args 中包含 timeMin, timeMax 和 q
         const searchParams = {    
           q: args.subject,      
@@ -142,10 +143,13 @@ export async function runner(rawArgs: any, userId: string) {
           timeMin: args.start,          
         };
         return await listEvents(client, searchParams);
-      case 'update':
+      }
+      case 'update': {
         return await updateEvent(client, args); // 假设 updateEvent 是定义好的函数
-      case 'delete':
+      }
+      case 'delete': {
         return await deleteEvent(client, args.eventId); // 假设 deleteEvent 是定义好的函数
+      }
       default:
         throw new Error('Invalid action');
     }
@@ -154,6 +158,7 @@ export async function runner(rawArgs: any, userId: string) {
     throw error;
   }
 }
+
 
 
 export default runner;
