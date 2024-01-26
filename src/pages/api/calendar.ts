@@ -1,13 +1,10 @@
-import {
-  PluginErrorType,
-  createErrorResponse,
-} from '@lobehub/chat-plugin-sdk';
 import fetch from 'node-fetch';
 import { OAuth2Client } from 'google-auth-library';
 import { sessionManager } from './sessionManager';
 import { runner } from './_utils'; // 假设这是处理日历操作的函数
 
 const express = require('express');
+
 const app = express();
 app.use(express.json());
 
@@ -23,12 +20,12 @@ const authClient = new OAuth2Client(googleClientId, googleClientSecret, googleRe
 function buildAuthUrl() {
   const authEndpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
   const queryParams = new URLSearchParams({
-    client_id: googleClientId, // 使用环境变量
-    response_type: 'code',
-    scope: googleScopes, // 使用环境变量
     access_type: 'offline', 
+    client_id: googleClientId, // 使用环境变量
     prompt: 'consent',
-    redirect_uri: googleRedirectUri // 使用环境变量
+    redirect_uri: googleRedirectUri, // 使用环境变量
+    response_type: 'code',
+    scope: googleScopes // 使用环境变量
   });
 
   return `${authEndpoint}?${queryParams.toString()}`;
@@ -51,10 +48,10 @@ app.use(async (req, res) => {
         // 存储用户会话
         const userId = '12345'; // 这里需要逻辑来确定用户ID
         sessionManager.storeSession(userId, {
-          accessToken: tokens.access_token,
-          refreshToken: tokens.refresh_token,
+          accessToken: tokens.access_token,      
+          createdAt: new Date(),
           expiresIn: tokens.expiry_date,
-          createdAt: new Date()
+          refreshToken: tokens.refresh_token
         });
 
         // 返回成功消息
@@ -77,9 +74,9 @@ app.use(async (req, res) => {
         const { credentials } = await authClient.refreshToken(session.refreshToken);
         sessionManager.storeSession(userId, {
           accessToken: credentials.access_token,
-          refreshToken: credentials.refresh_token || session.refreshToken,
+          createdAt: new Date(),          
           expiresIn: credentials.expiry_date,
-          createdAt: new Date()
+          refreshToken: credentials.refresh_token || session.refreshToken          
         });
 
         res.json({ accessToken: credentials.access_token });
@@ -125,9 +122,9 @@ app.use(async (req, res) => {
             const refreshedTokens = await refreshResponse.json();
             sessionManager.storeSession(userId, {
               accessToken: refreshedTokens.accessToken,
-              refreshToken: refreshedTokens.refreshToken || session.refreshToken,
+              createdAt: new Date(),
               expiresIn: refreshedTokens.expiresIn,
-              createdAt: new Date()
+              refreshToken: refreshedTokens.refreshToken || session.refreshToken           
             });
 
             session = sessionManager.getSession(userId); //重新获取更新后的会话

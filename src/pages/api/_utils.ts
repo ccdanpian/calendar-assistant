@@ -32,19 +32,19 @@ function convertToRunnerArgs(data) {
     start: {
       dateTime: startDateTime ? startDateTime : undefined,
       timeZone: 'Asia/Shanghai',    
-    },
-    subject: subject,
+    },    
     description: description,
     eventId: eventId,
+    subject: subject,
   };
 }
 
 async function addEvent(client, args) {
   const event = {
+    description: args.description,
     end: args.end,
     start: args.start,
-    summary: args.subject,
-    description: args.description,
+    summary: args.subject,    
   };
   const response = await client.events.insert({
     calendarId: 'primary',
@@ -65,11 +65,9 @@ async function listEvents(client, searchParams) {
   try {
     const events = await client.events.list({
       calendarId: 'primary',
-      timeMin: formattedTimeMin,
+      q: q,
       timeMax: formattedTimeMax,
-      q: q
-      // singleEvents: true,
-      //orderBy: 'startTime'
+      timeMin: formattedTimeMin,
     });
     return events.data.items;
   } catch (error) {
