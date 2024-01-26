@@ -39,7 +39,7 @@ function convertToRunnerArgs(data: any) {
   };
 }
 
-async function addEvent(client: any, args) {
+async function addEvent(client: any, args: any) {
   const event = {
     description: args.description,
     end: args.end,
@@ -78,7 +78,7 @@ async function listEvents(client: any, searchParams: any) {
 
 
 
-async function updateEvent(client: any, args) {
+async function updateEvent(client: any, args: any) {
   const { eventId, updateFields } = args; // updateFields 包含要更新的字段
 
   if (!eventId || !updateFields) {
