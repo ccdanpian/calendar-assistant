@@ -55,7 +55,7 @@ async function addEvent(client: any, args) {
 
 // 下面是各个函数的示例实现，您需要根据您的需求和 Google Calendar API 的使用来完善这些函数
 
-async function listEvents(client: any, searchParams) {
+async function listEvents(client: any, searchParams: any) {
   const {q, timeMax, timeMin} = searchParams;
 
   // 将 dateTime 从对象中提取并转换为 RFC3339 格式字符串
@@ -99,7 +99,7 @@ async function updateEvent(client: any, args) {
 }
 
 
-async function deleteEvent(client: any, eventId) {
+async function deleteEvent(client: any, eventId: string) {
   if (!eventId) {
     console.error('请提供日程标题或者ID');
     return '请提供日程标题或者ID';
