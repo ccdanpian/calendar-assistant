@@ -11,7 +11,7 @@ function getGoogleCalendarClient(accessToken: string) {
 
 
 // å°åå§æ°æ®è½¬æ¢ä¸º RunnerArgs ç±»å
-function convertToRunnerArgs(data: object) {
+function convertToRunnerArgs(data: any) {
 
   // 确保每个属性都正确访问
   const action = data.action;
