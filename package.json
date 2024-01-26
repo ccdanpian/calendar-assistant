@@ -55,6 +55,7 @@
     "@lobehub/chat-plugin-sdk": "^1",
     "@lobehub/chat-plugins-gateway": "^1",
     "@lobehub/ui": "latest",
+    "@types/express": "^4.17.21",
     "@microsoft/microsoft-graph-client": "^3.0.7",
     "antd": "^5",
     "antd-style": "^3",
@@ -74,6 +75,7 @@
   "devDependencies": {
     "@commitlint/cli": "^18",
     "@lobehub/lint": "latest",
+    "@types/express": "^4.17.21",
     "@types/react": "18",
     "@vercel/node": "^2",
     "@vitest/coverage-v8": "latest",
