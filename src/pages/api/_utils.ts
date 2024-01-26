@@ -2,11 +2,11 @@ import { google } from 'googleapis';
 
 import { sessionManager } from './sessionManager';
 
-// åå»º Google Calendar API å®¢æ·ç«¯
-function getGoogleCalendarClient(accessToken) {
+// 创建 Google Calendar API 客户端
+function getGoogleCalendarClient(accessToken: string) {
   const auth = new google.auth.OAuth2();
   auth.setCredentials({ access_token: accessToken });
-  return google.calendar({auth,  version: 'v3'});
+  return google.calendar({ auth, version: 'v3' });
 }
 
 
