@@ -1,6 +1,13 @@
 # Eslintignore for LobeHub
 ################################################################
 
+# Ignore files for ESLint
+node_modules
+dist
+es
+lib
+logs
+
 # dependencies
 node_modules
 
