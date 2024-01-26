@@ -91,19 +91,25 @@ app.use(async (req: Request, res: Response) => {
           refresh_token: session.refreshToken
         });
       
-        // 刷新访问令牌
-        const { tokens } = await authClient.refreshToken();
+        // 尝试刷新访问令牌
+        try {
+          const { credentials } = await authClient.refreshAccessToken();
+          sessionManager.storeSession(userId, {
+            accessToken: credentials.access_token,
+            createdAt: new Date(),          
+            expiresIn: credentials.expiry_date,
+            refreshToken: credentials.refresh_token || session.refreshToken
+          });
       
-        sessionManager.storeSession(userId, {
-          accessToken: tokens.access_token,
-          createdAt: new Date(),          
-          expiresIn: tokens.expiry_date,
-          refreshToken: tokens.refresh_token || session.refreshToken
-        });
-      
-        res.json({ accessToken: tokens.access_token });
-        return;
+          res.json({ accessToken: credentials.access_token });
+          return;
+        } catch (error) {
+          console.error('Error refreshing token:', error);
+          res.status(401).json({ error: 'Failed to refresh token' });
+          return;
+        }
       }
+      
       
       res.status(400).json({ error: 'Refresh token missing or invalid' });
       return;
