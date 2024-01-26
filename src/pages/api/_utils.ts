@@ -39,7 +39,7 @@ function convertToRunnerArgs(data: any) {
   };
 }
 
-async function addEvent(client, args) {
+async function addEvent(client: any, args) {
   const event = {
     description: args.description,
     end: args.end,
@@ -55,7 +55,7 @@ async function addEvent(client, args) {
 
 // 下面是各个函数的示例实现，您需要根据您的需求和 Google Calendar API 的使用来完善这些函数
 
-async function listEvents(client, searchParams) {
+async function listEvents(client: any, searchParams) {
   const {q, timeMax, timeMin} = searchParams;
 
   // 将 dateTime 从对象中提取并转换为 RFC3339 格式字符串
@@ -78,7 +78,7 @@ async function listEvents(client, searchParams) {
 
 
 
-async function updateEvent(client, args) {
+async function updateEvent(client: any, args) {
   const { eventId, updateFields } = args; // updateFields 包含要更新的字段
 
   if (!eventId || !updateFields) {
@@ -99,7 +99,7 @@ async function updateEvent(client, args) {
 }
 
 
-async function deleteEvent(client, eventId) {
+async function deleteEvent(client: any, eventId) {
   if (!eventId) {
     console.error('请提供日程标题或者ID');
     return '请提供日程标题或者ID';
