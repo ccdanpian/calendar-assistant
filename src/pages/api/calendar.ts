@@ -139,7 +139,8 @@ app.use(async (req: Request, res: Response) => {
         return;
       }
 
-      if (!session || !session.accessToken || new Date() > new Date(session.createdAt.getTime() + (session.expiresIn * 1000))) {
+      if (!session || !session.accessToken || new Date() > new Date(session.createdAt.getTime() + ((session.expiresIn || 0) * 1000))) {
+        // ... 其他代码 ...
         if (session && session.refreshToken) {
           try {
             // 使用Google Auth Library刷新令牌
