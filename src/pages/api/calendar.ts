@@ -24,8 +24,8 @@ const authClient = new OAuth2Client(googleClientId, googleClientSecret, googleRe
 async function decodeIdToken(idToken: string): Promise<any> {
   const client = new OAuth2Client();
   const ticket = await client.verifyIdToken({
-    idToken: idToken,
     audience: googleClientId,  // 指定您的 Google OAuth 2.0 客户端 ID
+    idToken: idToken,    
   });
   return ticket.getPayload();
 }
@@ -37,7 +37,7 @@ async function extractUserIdFromOAuth(tokens: any): Promise<string> {
       const decodedIdToken = await decodeIdToken(tokens.id_token);
       return decodedIdToken ? decodedIdToken.email : ''; // 使用 email 作为用户 ID
     } catch (error) {
-      throw new Error('Error decoding ID token: ' );
+      console.error('Error decoding ID token:', error);
     }
   } else {
     throw new Error('No ID token found in OAuth tokens');

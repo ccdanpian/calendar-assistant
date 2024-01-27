@@ -19,6 +19,7 @@ class SessionManager {
   storeSession(userId: string, session: Session) {
     // console.log(`Storing session for user ${userId}:`, session);
     this.sessions.set(userId, session);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const retrievedSession = this.getSession(userId);
     // console.log('Retrieved session for user', userId, retrievedSession);
   }
