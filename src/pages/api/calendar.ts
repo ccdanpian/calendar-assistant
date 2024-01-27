@@ -35,14 +35,17 @@ async function extractUserIdFromOAuth(tokens: any): Promise<string> {
   if (tokens && tokens.id_token) {
     try {
       const decodedIdToken = await decodeIdToken(tokens.id_token);
-      return decodedIdToken ? decodedIdToken.email : ''; // 使用 email 作为用户 ID
+      return decodedIdToken ? decodedIdToken.email : ''; // 或者根据您的需要处理解码失败的情况
     } catch (error) {
-      console.error('Error decoding ID token:', error);
-    }
+      const message = (error as Error).message;
+      console.error(message);
+    }    
   } else {
     throw new Error('No ID token found in OAuth tokens');
   }
+  return "no token"
 }
+
 
 
 function buildAuthUrl() {
