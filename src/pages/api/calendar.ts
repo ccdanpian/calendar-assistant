@@ -128,13 +128,13 @@ app.use(async (req: Request, res: Response) => {
 
       let session = sessionManager.getSession(userId);
 
-      console.log(`111111`);
+      // console.log(`111111`);
 
       if (!session) {
         // 会话不存在，生成跳转认证URL
-        console.log(`222222`);
+        // console.log(`222222`);
         const authUrl = buildAuthUrl(); 
-        console.log(`333333`, authUrl);
+        // console.log(`333333`, authUrl);
         res.json({ authUrl: authUrl });
         return;
       }
