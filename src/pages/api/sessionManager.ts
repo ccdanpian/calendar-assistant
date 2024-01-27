@@ -29,7 +29,7 @@ class SessionManager {
     console.log(`Geted session for user ${userId}`, session);
     if (!session) {
       console.log(`No session found for user ${userId}`);
-      return undefined;
+      return null;
     }
     return session;
   }
