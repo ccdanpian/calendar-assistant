@@ -21,7 +21,7 @@ class SessionManager {
     this.sessions.set(userId, session);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const retrievedSession = this.getSession(userId);
-    // console.log('Retrieved session for user', userId, retrievedSession);
+    console.log('Retrieved session for user', userId, retrievedSession);
   }
 
   // Retrieve a session for a specific user
