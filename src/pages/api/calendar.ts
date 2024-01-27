@@ -19,6 +19,32 @@ const googleScopes = process.env.GOOGLE_SCOPES;
 // 创建OAuth2Client实例
 const authClient = new OAuth2Client(googleClientId, googleClientSecret, googleRedirectUri);
 
+
+// 使用 Google OAuth2Client 解码 ID 令牌
+async function decodeIdToken(idToken: string): Promise<any> {
+  const client = new OAuth2Client();
+  const ticket = await client.verifyIdToken({
+    idToken: idToken,
+    audience: googleClientId,  // 指定您的 Google OAuth 2.0 客户端 ID
+  });
+  return ticket.getPayload();
+}
+
+// 从 OAuth 令牌中提取用户 ID（例如，用户的邮箱）
+async function extractUserIdFromOAuth(tokens: any): Promise<string> {
+  if (tokens && tokens.id_token) {
+    try {
+      const decodedIdToken = await decodeIdToken(tokens.id_token);
+      return decodedIdToken ? decodedIdToken.email : ''; // 使用 email 作为用户 ID
+    } catch (error) {
+      throw new Error('Error decoding ID token: ' );
+    }
+  } else {
+    throw new Error('No ID token found in OAuth tokens');
+  }
+}
+
+
 function buildAuthUrl() {
   const authEndpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
 
@@ -55,7 +81,8 @@ app.use(async (req: Request, res: Response) => {
         authClient.setCredentials(tokens);
 
         // 存储用户会话
-        const userId = '12345'; // 这里需要逻辑来确定用户ID
+        // 从 OAuth 提供的信息中获取用户身份
+        const userId = extractUserIdFromOAuth(tokens); // 这里需要实现 extractUserIdFromOAuth 函数
         const accessToken = tokens.access_token || 'no-access-token'; // 提供默认值或处理为错误
         const refreshToken = tokens.refresh_token || 'no-refresh-token'; // 提供默认值或处理为错误
 
@@ -63,7 +90,7 @@ app.use(async (req: Request, res: Response) => {
         // 或者，如果您不想在null时赋值，可以使用条件运算符
         // const expiresIn = tokens.expiry_date != null ? tokens.expiry_date : undefined;
 
-        sessionManager.storeSession(userId, {
+        sessionManager.storeSession(await userId, {
           accessToken: accessToken,
           createdAt: new Date(),
           expiresIn: expiresIn, // 使用处理过的值
