@@ -2,14 +2,14 @@
   "$schema": "../node_modules/@lobehub/chat-plugin-sdk/schema.json",
   "api": [
     {
-      "url": "https://bug-free-trout-rjrvv49vg753p55x-3400.app.github.dev/api/calendar",
+      "url": "https://calendar-assistant.vercel.app/api/calendar",
       "name": "manageEvents",
       "description": "管理用户的日程事件，包括添加、查询、更新和删除，并给出日历地址",
       "parameters": {
         "properties": {
           "action": {
-            "description": "要执行的操作，如添加（add）、查询（list）、更新（update）、删除（delete）",
-            "enum": ["add", "list", "update", "delete"],
+            "description": "要执行的操作，如添加（add）、查询（list）、删除（delete）",
+            "enum": ["add", "list", "delete"],
             "type": "string"
           },
           "startDateTime": {
