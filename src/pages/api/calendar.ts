@@ -1,7 +1,9 @@
+// import {getPluginSettingsFromRequest} from '@lobehub/chat-plugin-sdk';
 import fetch from 'node-fetch';
 import { OAuth2Client } from 'google-auth-library';
 import { sessionManager } from './sessionManager';
 import { runner } from './_utils'; // 假设这是处理日历操作的函数
+// import { Settings } from './_types';
 
 // const express = require('express');
 
@@ -15,6 +17,8 @@ const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 const googleRedirectUri = process.env.GOOGLE_REDIRECT_URI;
 const googleScopes = process.env.GOOGLE_SCOPES;
+
+const googleUserId = process.env.GOOGLE_USER_ID;
 
 // 创建OAuth2Client实例
 const authClient = new OAuth2Client(googleClientId, googleClientSecret, googleRedirectUri);
@@ -35,18 +39,17 @@ async function extractUserIdFromOAuth(tokens: any): Promise<string> {
   if (tokens && tokens.id_token) {
     try {
       const decodedIdToken = await decodeIdToken(tokens.id_token);
-      return decodedIdToken ? decodedIdToken.email : ''; // 或者根据您的需要处理解码失败的情况
+      console.log('decodeIdToken', decodedIdToken);
+      return decodedIdToken.email; // 使用解码后的 ID 令牌中的电子邮件地址
     } catch (error) {
       const message = (error as Error).message;
       console.error(message);
+      throw new Error('Error decoding ID token: ' + message);
     }    
   } else {
     throw new Error('No ID token found in OAuth tokens');
   }
-  return "no token"
 }
-
-
 
 function buildAuthUrl() {
   const authEndpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -54,7 +57,7 @@ function buildAuthUrl() {
   // 确保所有环境变量都有值，或提供默认值
   const clientId = googleClientId || 'default-client-id';
   const redirectUri = googleRedirectUri || 'default-redirect-uri';
-  const scopes = googleScopes || 'default-scopes';
+  const scopes = googleScopes || 'https://www.googleapis.com/auth/calendar openid email';
 
   const queryParams = new URLSearchParams({
     access_type: 'offline', 
@@ -112,7 +115,8 @@ app.use(async (req: Request, res: Response) => {
     } else if (req.path === '/api/calendar' && req.method === 'POST' && req.body.authorizationCode) {
       // ... googleAuth.ts 中的 POST 请求处理逻辑 ...
       // 处理令牌刷新请求（POST）
-      const userId = '12345'; // 从请求中获取用户ID
+      const userId = googleUserId || 'zhanghua.x@gmail.com'; // 从请求中获取用户ID
+      // const userId = getPluginSettingsFromRequest<Settings>(req);
       const session = sessionManager.getSession(userId);
 
       if (session && session.refreshToken) {
@@ -154,11 +158,11 @@ app.use(async (req: Request, res: Response) => {
       const rawArgs = req.body;
       const args = JSON.parse(rawArgs);
 
-      const userId = "12345";
+      const userId = googleUserId || 'zhanghua.x@gmail.com'; // 从请求中获取用户ID
 
       let session = sessionManager.getSession(userId);
 
-      // console.log(`111111`);
+      console.log(`111111`, userId);
 
       if (!session) {
         // 会话不存在，生成跳转认证URL
