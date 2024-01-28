@@ -13,11 +13,11 @@
             "type": "string"
           },
           "startDateTime": {
-            "description": "用户给出的日程开始日期和时间; 在执行'add'或'list'时，需询问用户获取；当执行'delete'时, 如果用户未指定时,用2020年1月1号0点的时间替代; 使用格式为{'YYYY-MM-DDTHH:mm:ss.SSSZ' }",
+            "description": "用户给出的日程开始日期和时间; 在执行'add'或'list'时，需询问用户获取；当执行'delete'时, 如果用户未指定时,用2020年1月1号0点的时间替代; 使用格式为{'YYYY-MM-DDTHH:mm:ss.SSS' }",
             "type": "string"
           },
           "endDateTime": {
-            "description": "用户给出的日程结束日期和时间; 在执行'add'或'list'时，需询问用户获取； 当执行'delete'时, 如果用户未指定时,用2030年的12月31号24点替代; 使用格式为{'YYYY-MM-DDTHH:mm:ss.SSSZ' }",
+            "description": "用户给出的日程结束日期和时间; 在执行'add'或'list'时，需询问用户获取； 当执行'delete'时, 如果用户未指定时,用2030年的12月31号24点替代; 使用格式为{'YYYY-MM-DDTHH:mm:ss.SSS' }",
             "type": "string"
           },
           "eventDetails": {

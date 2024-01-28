@@ -1,5 +1,5 @@
 // import {getPluginSettingsFromRequest} from '@lobehub/chat-plugin-sdk';
-import fetch from 'node-fetch';
+// import fetch from 'node-fetch';
 import { OAuth2Client } from 'google-auth-library';
 import { sessionManager } from './sessionManager';
 import { runner } from './_utils'; // 假设这是处理日历操作的函数
@@ -88,7 +88,7 @@ app.use(async (req: Request, res: Response) => {
 
         // 存储用户会话
         // 从 OAuth 提供的信息中获取用户身份
-        const userId = extractUserIdFromOAuth(tokens); // 这里需要实现 extractUserIdFromOAuth 函数
+        const userId = await extractUserIdFromOAuth(tokens);// 这里需要实现 extractUserIdFromOAuth 函数
         const accessToken = tokens.access_token || 'no-access-token'; // 提供默认值或处理为错误
         const refreshToken = tokens.refresh_token || 'no-refresh-token'; // 提供默认值或处理为错误
 
@@ -96,7 +96,7 @@ app.use(async (req: Request, res: Response) => {
         // 或者，如果您不想在null时赋值，可以使用条件运算符
         // const expiresIn = tokens.expiry_date != null ? tokens.expiry_date : undefined;
 
-        sessionManager.storeSession(await userId, {
+        sessionManager.storeSession(userId, {
           accessToken: accessToken,
           createdAt: new Date(),
           expiresIn: expiresIn, // 使用处理过的值
@@ -158,7 +158,7 @@ app.use(async (req: Request, res: Response) => {
       const rawArgs = req.body;
       const args = JSON.parse(rawArgs);
 
-      const userId = googleUserId || 'zhanghua.x@gmail.com'; // 从请求中获取用户ID
+      const userId = googleUserId || 'zhanghua.x@gmail.com'; 
 
       let session = sessionManager.getSession(userId);
 
@@ -177,36 +177,34 @@ app.use(async (req: Request, res: Response) => {
         // ... 其他代码 ...
         if (session && session.refreshToken) {
           try {
-            // 使用Google Auth Library刷新令牌
-            const refreshResponse = await fetch('http://localhost:3400/api/calendar', { //这个URL应该指向您的googleAuth路由
-              body: JSON.stringify({ refreshToken: session.refreshToken }),
-              headers: { 'Content-Type': 'application/json' },
-              method: 'POST'
+            // 使用 Google Auth Library 刷新令牌
+            authClient.setCredentials({
+              refresh_token: session.refreshToken
             });
-
-            if (!refreshResponse.ok) {
-              throw new Error('Failed to refresh token');
-            }
-
-            const refreshedTokens = await refreshResponse.json();
+        
+            const { credentials } = await authClient.refreshAccessToken();
+        
+            // 更新会话信息
             sessionManager.storeSession(userId, {
-              accessToken: refreshedTokens.accessToken,
+              accessToken: credentials.access_token || 'default-access-token', // 提供默认值或处理为错误,
               createdAt: new Date(),
-              expiresIn: refreshedTokens.expiresIn,
-              refreshToken: refreshedTokens.refreshToken || session.refreshToken           
+              expiresIn: credentials.expiry_date || 0, // 如果expiry_date为null或undefined，则使用0,
+              refreshToken: credentials.refresh_token || session.refreshToken
             });
-
-            session = sessionManager.getSession(userId); //重新获取更新后的会话
+        
+            // 继续处理原始请求
           } catch (error) {
+            // 如果刷新令牌失败，处理错误
             console.error('Error refreshing token:', error);
-            res.status(401).json({ authUrl: buildAuthUrl() });
+            res.status(401).json({ error: 'Failed to refresh token' });
             return;
           }
         } else {
+          // 如果没有有效的刷新令牌，需要重新授权
           const authUrl = buildAuthUrl();
           res.status(401).json({ authUrl: authUrl });
           return;
-        }
+        }        
       }
 
       const result = await runner(args, userId);  //执行日历操作
