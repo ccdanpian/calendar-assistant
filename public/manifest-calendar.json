@@ -2,22 +2,22 @@
   "$schema": "../node_modules/@lobehub/chat-plugin-sdk/schema.json",
   "api": [
     {
-      "url": "https://calendar-assistant.vercel.app/api/calendar",
+      "url": "https://bug-free-trout-rjrvv49vg753p55x-3400.app.github.dev/api/calendar",
       "name": "manageEvents",
       "description": "管理用户的日程事件，包括添加、查询、更新和删除，并给出日历地址",
       "parameters": {
         "properties": {
           "action": {
-            "description": "要执行的操作，如添加（add）、查询（list）、删除（delete）",
+            "description": "要执行的操作, 如添加:add, 查询:list, 删除:delete",
             "enum": ["add", "list", "delete"],
             "type": "string"
           },
           "startDateTime": {
-            "description": "用户给出的日程开始日期和时间; 在执行'add'或'list'时，需询问用户获取；当执行'delete'时, 如果用户未指定时,用2020年1月1号0点的时间替代; 使用格式为{'YYYY-MM-DDTHH:mm:ss.SSS' }",
+            "description": "用户给出的日程开始日期和时间; 在执行'add'或'list'时,需询问用户获取; 使用格式为{'YYYY-MM-DDTHH:mm:ss.SSS+08:00' }",
             "type": "string"
           },
           "endDateTime": {
-            "description": "用户给出的日程结束日期和时间; 在执行'add'或'list'时，需询问用户获取； 当执行'delete'时, 如果用户未指定时,用2030年的12月31号24点替代; 使用格式为{'YYYY-MM-DDTHH:mm:ss.SSS' }",
+            "description": "用户给出的日程结束日期和时间; 在执行'add'或'list'时,需询问用户获取; 用格式为{'YYYY-MM-DDTHH:mm:ss.SSS+08:00' }",
             "type": "string"
           },
           "eventDetails": {
@@ -41,7 +41,7 @@
   ],
   "author": "cc",
   "createdAt": "2024-01-08",
-  "homepage": "https://github.com/your-github-repo",
+  "homepage": "https://github.com/ccdanpian/chat-plugin-calendar",
   "identifier": "calendar-assistant",
   "meta": {
     "avatar": "📅",
@@ -49,5 +49,5 @@
     "title": "Calendar Assistant",
     "description": "A plugin to manage your calendar events"
   },
-  "version": "1"
+   "version": "1"
 }
