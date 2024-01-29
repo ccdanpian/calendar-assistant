@@ -20,7 +20,7 @@ const googleScopes = process.env.GOOGLE_SCOPES;
 
 const googleUserId = process.env.GOOGLE_USER_ID;
 
-const expiresIn_s: number = parseInt(process.env.EXPIRES_IN || '1800', 10);
+const expiresIn_s: number = Number.parseInt(process.env.EXPIRES_IN || '1800', 10);
 
 // 创建OAuth2Client实例
 const authClient = new OAuth2Client(googleClientId, googleClientSecret, googleRedirectUri);
