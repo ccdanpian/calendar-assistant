@@ -10,7 +10,7 @@ function getGoogleCalendarClient(accessToken: string) {
 }
 
 
-// å°åå§æ°æ®è½¬æ¢ä¸º RunnerArgs ç±»å
+// 
 function convertToRunnerArgs(data: any) {
 
   // 确保每个属性都正确访问
@@ -53,14 +53,30 @@ async function addEvent(client: any, args: any) {
   return response.data;
 }
 
-// 下面是各个函数的示例实现，您需要根据您的需求和 Google Calendar API 的使用来完善这些函数
-
+// 下面是各个函数的示例实现
 async function listEvents(client: any, searchParams: any) {
   const {q, timeMax, timeMin} = searchParams;
 
-  // 将 dateTime 从对象中提取并转换为 RFC3339 格式字符串
-  const formattedTimeMin = timeMin.dateTime; // 假设为北京时间
-  const formattedTimeMax = timeMax.dateTime; // 假设为北京时间
+  let formattedTimeMin = ''; // 默认时间
+  let formattedTimeMax = ''; // 默认时间
+
+  if (timeMin && timeMin.dateTime) {
+    formattedTimeMin = timeMin.dateTime;
+  } else {
+    // 设置默认的最小时间
+    formattedTimeMin = new Date().toISOString();
+  }
+
+  if (timeMax && timeMax.dateTime) {
+    formattedTimeMax = timeMax.dateTime;
+  } else {
+    // 设置默认的最大时间为一年后
+    const oneYearLater = new Date();
+    oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
+    formattedTimeMax = oneYearLater.toISOString();
+  }
+
+  console.log(`Extracted data: action=list, startDateTime=${formattedTimeMin}, endDateTime=${formattedTimeMax}`);
 
   try {
     const events = await client.events.list({
@@ -75,8 +91,6 @@ async function listEvents(client: any, searchParams: any) {
     throw error;
   }
 }
-
-
 
 async function updateEvent(client: any, args: any) {
   const { eventId, updateFields } = args; // updateFields 包含要更新的字段
@@ -117,8 +131,7 @@ async function deleteEvent(client: any, eventId: string) {
   }
 }
 
-
-// Runner å½æ°
+// Runner
 export async function runner(rawArgs: any, userId: string) {
   try {
     const session = sessionManager.getSession(userId);
@@ -158,7 +171,5 @@ export async function runner(rawArgs: any, userId: string) {
     throw error;
   }
 }
-
-
 
 export default runner;
