@@ -40,12 +40,22 @@ function convertToRunnerArgs(data: any) {
 }
 
 async function addEvent(client: any, args: any) {
+  let formattedTimeStart = ''; // 默认时间
+  let formattedTimeEnd = ''; // 默认时间
+
+  formattedTimeStart = (args.start) ? args.start : new Date().toISOString();
+  formattedTimeEnd = (args.end) ? args.end : (() => {
+    const twoHoursLater = new Date(new Date().getTime() + 2 * 60 * 60 * 1000);
+    return twoHoursLater.toISOString();
+  })();
+
   const event = {
     description: args.description,
-    end: args.end,
-    start: args.start,
+    end: formattedTimeEnd,
+    start: formattedTimeStart,
     summary: args.subject,    
   };
+
   const response = await client.events.insert({
     calendarId: 'primary',
     resource: event,
@@ -53,7 +63,6 @@ async function addEvent(client: any, args: any) {
   return response.data;
 }
 
-// 下面是各个函数的示例实现
 async function listEvents(client: any, searchParams: any) {
   const {q, timeMax, timeMin} = searchParams;
 
