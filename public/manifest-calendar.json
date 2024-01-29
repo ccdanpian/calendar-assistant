@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@lobehub/chat-plugin-sdk/schema.json",
   "api": [
     {
-      "url": "https://bug-free-trout-rjrvv49vg753p55x-3400.app.github.dev/api/calendar",
+      "url": "https://ccalendar.space/api/calendar",
       "name": "manageEvents",
       "description": "管理用户的日程事件，包括添加、查询、更新和删除，并给出日历地址",
       "parameters": {
