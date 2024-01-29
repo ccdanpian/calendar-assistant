@@ -93,7 +93,7 @@ app.use(async (req: Request, res: Response) => {
         const refreshToken = tokens.refresh_token || 'no-refresh-token'; // 提供默认值或处理为错误
 
         // const expiresIn = tokens.expiry_date || 0; // 如果expiry_date为null或undefined，则使用0
-        const expiresIn = 180; //设置为3分钟
+        const expiresIn = 1800; //设置为30分钟
 
         sessionManager.storeSession(userId, {
           accessToken: accessToken,
@@ -131,7 +131,7 @@ app.use(async (req: Request, res: Response) => {
           const accessToken = credentials.access_token || 'default-access-token'; // 提供默认值或处理为错误
           const refreshToken = credentials.refresh_token || 'default-refresh-token'; // 提供默认值或处理为错误
           // const expiresIn = credentials.expiry_date || 0; // 如果expiry_date为null或undefined，则使用0
-          const expiresIn = 180; //设置为3分钟
+          const expiresIn = 1800; //设置为30分钟
 
           sessionManager.storeSession(userId, {
             accessToken: accessToken,
@@ -192,7 +192,7 @@ app.use(async (req: Request, res: Response) => {
               accessToken: credentials.access_token || 'default-access-token', // 提供默认值或处理为错误,
               createdAt: new Date(),
               // expiresIn: credentials.expiry_date || 0, // 如果expiry_date为null或undefined，则使用0,
-              expiresIn: 300, // 设置为5分钟
+              expiresIn: 1800, // 设置为30分钟
               refreshToken: credentials.refresh_token || session.refreshToken
             });
         
