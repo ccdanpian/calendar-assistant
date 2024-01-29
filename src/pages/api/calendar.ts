@@ -92,9 +92,8 @@ app.use(async (req: Request, res: Response) => {
         const accessToken = tokens.access_token || 'no-access-token'; // 提供默认值或处理为错误
         const refreshToken = tokens.refresh_token || 'no-refresh-token'; // 提供默认值或处理为错误
 
-        const expiresIn = tokens.expiry_date || 0; // 如果expiry_date为null或undefined，则使用0
-        // 或者，如果您不想在null时赋值，可以使用条件运算符
-        // const expiresIn = tokens.expiry_date != null ? tokens.expiry_date : undefined;
+        // const expiresIn = tokens.expiry_date || 0; // 如果expiry_date为null或undefined，则使用0
+        const expiresIn = 180; //设置为3分钟
 
         sessionManager.storeSession(userId, {
           accessToken: accessToken,
@@ -131,12 +130,13 @@ app.use(async (req: Request, res: Response) => {
 
           const accessToken = credentials.access_token || 'default-access-token'; // 提供默认值或处理为错误
           const refreshToken = credentials.refresh_token || 'default-refresh-token'; // 提供默认值或处理为错误
-          const expiresIn = credentials.expiry_date || 0; // 如果expiry_date为null或undefined，则使用0
+          // const expiresIn = credentials.expiry_date || 0; // 如果expiry_date为null或undefined，则使用0
+          const expiresIn = 180; //设置为3分钟
 
           sessionManager.storeSession(userId, {
             accessToken: accessToken,
             createdAt: new Date(),
-            expiresIn: expiresIn,
+            expiresIn: expiresIn, // 使用处理过的值
             refreshToken: refreshToken
           });
 
@@ -167,16 +167,19 @@ app.use(async (req: Request, res: Response) => {
       if (!session) {
         // 会话不存在，生成跳转认证URL
         // console.log(`222222`);
-        const authUrl = buildAuthUrl(); 
-        // console.log(`333333`, authUrl);
+        const authUrl = buildAuthUrl();  
         res.json({ authUrl: authUrl });
         return;
       }
 
+      console.log(`333333`, session.refreshToken);
+
       if (!session || !session.accessToken || new Date() > new Date(session.createdAt.getTime() + ((session.expiresIn || 0) * 1000))) {
         // ... 其他代码 ...
+        console.log(`444444`, session.refreshToken);
         if (session && session.refreshToken) {
           try {
+            console.log(`555555`, session.refreshToken);
             // 使用 Google Auth Library 刷新令牌
             authClient.setCredentials({
               refresh_token: session.refreshToken
@@ -188,7 +191,8 @@ app.use(async (req: Request, res: Response) => {
             sessionManager.storeSession(userId, {
               accessToken: credentials.access_token || 'default-access-token', // 提供默认值或处理为错误,
               createdAt: new Date(),
-              expiresIn: credentials.expiry_date || 0, // 如果expiry_date为null或undefined，则使用0,
+              // expiresIn: credentials.expiry_date || 0, // 如果expiry_date为null或undefined，则使用0,
+              expiresIn: 300, // 设置为5分钟
               refreshToken: credentials.refresh_token || session.refreshToken
             });
         
@@ -201,6 +205,7 @@ app.use(async (req: Request, res: Response) => {
           }
         } else {
           // 如果没有有效的刷新令牌，需要重新授权
+          console.log(`666666`, session.refreshToken);
           const authUrl = buildAuthUrl();
           res.status(401).json({ authUrl: authUrl });
           return;
