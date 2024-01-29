@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@lobehub/chat-plugin-sdk/schema.json",
   "api": [
     {
-      "url": "https://ccalendar.space/api/calendar",
+      "url": "https://calendar-assistant.vercel.app/api/calendar",
       "name": "manageEvents",
       "description": "管理用户的日程事件，包括添加、查询、删除，并给出日历地址",
       "parameters": {
