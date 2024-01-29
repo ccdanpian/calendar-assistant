@@ -60,21 +60,12 @@ async function listEvents(client: any, searchParams: any) {
   let formattedTimeMin = ''; // 默认时间
   let formattedTimeMax = ''; // 默认时间
 
-  if (timeMin && timeMin.dateTime) {
-    formattedTimeMin = timeMin.dateTime;
-  } else {
-    // 设置默认的最小时间
-    formattedTimeMin = new Date().toISOString();
-  }
-
-  if (timeMax && timeMax.dateTime) {
-    formattedTimeMax = timeMax.dateTime;
-  } else {
-    // 设置默认的最大时间为一年后
+  formattedTimeMin = (timeMin && timeMin.dateTime) ? timeMin.dateTime : new Date().toISOString();
+  formattedTimeMax = (timeMax && timeMax.dateTime) ? timeMax.dateTime : (() => {
     const oneYearLater = new Date();
     oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
-    formattedTimeMax = oneYearLater.toISOString();
-  }
+    return oneYearLater.toISOString();
+  })();
 
   console.log(`Extracted data: action=list, startDateTime=${formattedTimeMin}, endDateTime=${formattedTimeMax}`);
 
