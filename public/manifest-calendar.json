@@ -41,7 +41,7 @@
   ],
   "author": "cc",
   "createdAt": "2024-01-08",
-  "gateway": "http://ccalendar.space/api/gateway",
+  "gateway": "https://ccalendar.space/api/gateway",
   "homepage": "https://github.com/ccdanpian/chat-plugin-calendar",
   "identifier": "calendar-assistant",
   "meta": {
