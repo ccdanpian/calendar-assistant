@@ -20,6 +20,8 @@ const googleScopes = process.env.GOOGLE_SCOPES;
 
 const googleUserId = process.env.GOOGLE_USER_ID;
 
+const expiresIn_s: number = parseInt(process.env.EXPIRES_IN || '1800', 10);
+
 // 创建OAuth2Client实例
 const authClient = new OAuth2Client(googleClientId, googleClientSecret, googleRedirectUri);
 
@@ -93,12 +95,12 @@ app.use(async (req: Request, res: Response) => {
         const refreshToken = tokens.refresh_token || 'no-refresh-token'; // 提供默认值或处理为错误
 
         // const expiresIn = tokens.expiry_date || 0; // 如果expiry_date为null或undefined，则使用0
-        const expiresIn = 1800; //设置为30分钟
+        // const expiresIn = expiresIn; //设置为30分钟
 
         sessionManager.storeSession(userId, {
           accessToken: accessToken,
           createdAt: new Date(),
-          expiresIn: expiresIn, // 使用处理过的值
+          expiresIn: expiresIn_s, // 使用处理过的值
           refreshToken: refreshToken
         });
 
@@ -131,12 +133,12 @@ app.use(async (req: Request, res: Response) => {
           const accessToken = credentials.access_token || 'default-access-token'; // 提供默认值或处理为错误
           const refreshToken = credentials.refresh_token || 'default-refresh-token'; // 提供默认值或处理为错误
           // const expiresIn = credentials.expiry_date || 0; // 如果expiry_date为null或undefined，则使用0
-          const expiresIn = 1800; //设置为30分钟
+          // const expiresIn = 1800; //设置为30分钟
 
           sessionManager.storeSession(userId, {
             accessToken: accessToken,
             createdAt: new Date(),
-            expiresIn: expiresIn, // 使用处理过的值
+            expiresIn: expiresIn_s, // 使用处理过的值
             refreshToken: refreshToken
           });
 
@@ -192,7 +194,7 @@ app.use(async (req: Request, res: Response) => {
               accessToken: credentials.access_token || 'default-access-token', // 提供默认值或处理为错误,
               createdAt: new Date(),
               // expiresIn: credentials.expiry_date || 0, // 如果expiry_date为null或undefined，则使用0,
-              expiresIn: 1800, // 设置为30分钟
+              expiresIn: expiresIn_s, // 设置为30分钟
               refreshToken: credentials.refresh_token || session.refreshToken
             });
         
