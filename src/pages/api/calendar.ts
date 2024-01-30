@@ -88,7 +88,7 @@ app.use(async (req: Request, res: Response) => {
       console.log(`000000, calendar_user_id`, userId);
  
       let session = sessionManager.getSession(userId);
-      console.log(`111111, session: `, session);
+      console.log(`111111, session:`, session);
 
       if (!session) {
         // 会话不存在，生成跳转认证URL
@@ -100,10 +100,10 @@ app.use(async (req: Request, res: Response) => {
 
       if (!session || !session.accessToken || new Date() > new Date(session.createdAt.getTime() + ((session.expiresIn || 0) * 1000))) {
         // ... 其他代码 ...
-        console.log(`333333, refreshToken: `, session.refreshToken);
+        console.log(`333333, refreshToken:`, session.refreshToken);
         if (session && session.refreshToken) {
           try {
-            console.log(`555555, try refesh: `, session.refreshToken);
+            console.log(`555555, try refesh:`, session.refreshToken);
             // 使用 Google Auth Library 刷新令牌
             authClient.setCredentials({
               refresh_token: session.refreshToken
