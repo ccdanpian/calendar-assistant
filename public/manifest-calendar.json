@@ -2,9 +2,9 @@
   "$schema": "../node_modules/@lobehub/chat-plugin-sdk/schema.json",
   "api": [
     {
-      "url": "https://calendar-assistant.vercel.app/api/calendar",
+      "url": "https://bug-free-trout-rjrvv49vg753p55x-3400.app.github.dev/api/calendar",
       "name": "manageEvents",
-      "description": "管理用户的日程事件，包括添加、查询、删除，并给出日历地址",
+      "description": "管理用户的日程事件，包括添加、查询、更新和删除，并给出日历地址",
       "parameters": {
         "properties": {
           "action": {
@@ -35,19 +35,33 @@
         },
         "required": ["action"],
         "type": "object",
-        "description": "执行'add'或'list'时，要带上开始时间('startDateTime')和结束时间('endDateTime')，以及时间详细信息('eventDetails'); 执行'delete'的时候, 要带上'eventId '"
+        "description": "执行'add'或'list'时，要同时带上'startDateTime','endDateTime', 'eventSummary', eventDetails'; 执行'delete'的时候, 要带上'eventId '"
       }
     }
   ],
   "author": "cc",
   "createdAt": "2024-01-08",
-  "homepage": "https://github.com/ccdanpian/chat-plugin-calendar",
-  "identifier": "calendar-assistant",
+  "homepage": "https://github.com/your-github-repo",
+  "identifier": "calendar-assistant-dev11",
   "meta": {
     "avatar": "📅",
     "tags": ["calendar", "assistant", "schedule"],
     "title": "Calendar Assistant",
     "description": "A plugin to manage your calendar events"
+  },
+  "settings": {
+    "type": "object",
+    "required": ["CALENDAR_KEY"],
+    "properties": {
+      "CALENDAR_KEY": {
+        "title": "Calendar User Key",
+        "description": "we use Google Calendar API as backend service [Learn more](https://github.com/lobehub/chat-plugin-search-engine)",
+        "type": "string",
+        "minLength": 6,
+        "maxLength": 64,
+        "format": "password"
+      }
+    }
   },
    "version": "1"
 }
