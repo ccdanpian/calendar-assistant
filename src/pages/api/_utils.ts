@@ -45,7 +45,7 @@ async function addEvent(client: any, args: any) {
 
   formattedTimeStart = (args.start) ? args.start : new Date().toISOString();
   formattedTimeEnd = (args.end) ? args.end : (() => {
-    const twoHoursLater = new Date(new Date.now() + 2 * 60 * 60 * 1000);
+    const twoHoursLater = new Date(Date.now() + 2 * 60 * 60 * 1000);
     return twoHoursLater.toISOString();
   })();
 
