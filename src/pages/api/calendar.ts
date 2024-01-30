@@ -15,41 +15,12 @@ const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 const googleRedirectUri = process.env.GOOGLE_REDIRECT_URI;
 const googleScopes = process.env.GOOGLE_SCOPES;
-
-const googleUserId = process.env.GOOGLE_USER_ID;
-
 const expiresIn_s: number = Number.parseInt(process.env.EXPIRES_IN || '1800', 10);
+
+let calendarUserId: string = '';
 
 // 创建OAuth2Client实例
 const authClient = new OAuth2Client(googleClientId, googleClientSecret, googleRedirectUri);
-
-
-// 使用 Google OAuth2Client 解码 ID 令牌
-async function decodeIdToken(idToken: string): Promise<any> {
-  const client = new OAuth2Client();
-  const ticket = await client.verifyIdToken({
-    audience: googleClientId,  // 指定您的 Google OAuth 2.0 客户端 ID
-    idToken: idToken,    
-  });
-  return ticket.getPayload();
-}
-
-// 从 OAuth 令牌中提取用户 ID（例如，用户的邮箱）
-async function extractUserIdFromOAuth(tokens: any): Promise<string> {
-  if (tokens && tokens.id_token) {
-    try {
-      const decodedIdToken = await decodeIdToken(tokens.id_token);
-      console.log('decodeIdToken', decodedIdToken);
-      return decodedIdToken.email; // 使用解码后的 ID 令牌中的电子邮件地址
-    } catch (error) {
-      const message = (error as Error).message;
-      console.error(message);
-      throw new Error('Error decoding ID token: ' + message);
-    }    
-  } else {
-    throw new Error('No ID token found in OAuth tokens');
-  }
-}
 
 function buildAuthUrl() {
   const authEndpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -87,7 +58,8 @@ app.use(async (req: Request, res: Response) => {
 
         // 存储用户会话
         // 从 OAuth 提供的信息中获取用户身份
-        const userId = await extractUserIdFromOAuth(tokens);// 这里需要实现 extractUserIdFromOAuth 函数
+        //const userId = await extractUserIdFromOAuth(tokens);// 这里需要实现 extractUserIdFromOAuth 函数
+        const userId = calendarUserId;
         const accessToken = tokens.access_token || 'no-access-token'; // 提供默认值或处理为错误
         const refreshToken = tokens.refresh_token || 'no-refresh-token'; // 提供默认值或处理为错误
 
@@ -110,20 +82,13 @@ app.use(async (req: Request, res: Response) => {
       return;
 
     } else if (req.method === 'POST') {
-      // ... 原 app.ts 中的 POST 请求处理逻辑 ...
-      const calendar_setting_key = getCalendarKey(req);    
-      console.log(`000000, calendar_setting_key`, calendar_setting_key);  
-
-      const rawArgs = req.body;
-      const args = JSON.parse(rawArgs);
-
-      console.log(`000000, req.body`, req.body);
-
-      const userId = googleUserId || 'zhanghua.x@gmail.com'; 
-
+      // 获取用户设定的key，作为userId
+      calendarUserId = await getCalendarKey(req);    
+      const userId = calendarUserId;
+      console.log(`000000, calendar_user_id`, userId);
+ 
       let session = sessionManager.getSession(userId);
-
-      console.log(`111111`, userId);
+      console.log(`111111, session: `, session);
 
       if (!session) {
         // 会话不存在，生成跳转认证URL
@@ -170,6 +135,9 @@ app.use(async (req: Request, res: Response) => {
           return;
         }        
       }
+
+      const rawArgs = req.body;
+      const args = JSON.parse(rawArgs);
 
       const result = await runner(args, userId);  //执行日历操作
       res.status(200).json(result);
