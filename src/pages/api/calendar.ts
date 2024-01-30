@@ -5,8 +5,6 @@ import { sessionManager } from './sessionManager';
 import { runner } from './_utils'; // 假设这是处理日历操作的函数
 // import { Settings } from './_types';
 
-// const express = require('express');
-
 import express, { Request, Response } from 'express';
 
 const app = express();
@@ -74,7 +72,6 @@ function buildAuthUrl() {
 }
 
 
-
 app.use(async (req: Request, res: Response) => {
   try {
     if (req.path === '/api/calendar' && req.method === 'GET') {
@@ -94,7 +91,6 @@ app.use(async (req: Request, res: Response) => {
         const accessToken = tokens.access_token || 'no-access-token'; // 提供默认值或处理为错误
         const refreshToken = tokens.refresh_token || 'no-refresh-token'; // 提供默认值或处理为错误
 
-        // const expiresIn = tokens.expiry_date || 0; // 如果expiry_date为null或undefined，则使用0
         // const expiresIn = expiresIn; //设置为30分钟
 
         sessionManager.storeSession(userId, {
@@ -113,52 +109,12 @@ app.use(async (req: Request, res: Response) => {
       res.status(400).json({ error: 'Authorization code missing' });
       return;
 
-    } else if (req.path === '/api/calendar' && req.method === 'POST' && req.body.authorizationCode) {
-      // ... googleAuth.ts 中的 POST 请求处理逻辑 ...
-      // 处理令牌刷新请求（POST）
-      const userId = googleUserId || 'zhanghua.x@gmail.com'; // 从请求中获取用户ID
-      // const userId = getPluginSettingsFromRequest<Settings>(req);
-      const session = sessionManager.getSession(userId);
-
-      if (session && session.refreshToken) {
-        // 设置先前的令牌信息
-        authClient.setCredentials({
-          refresh_token: session.refreshToken
-        });
-      
-        // 尝试刷新访问令牌
-        try {
-          const { credentials } = await authClient.refreshAccessToken();
-
-          const accessToken = credentials.access_token || 'default-access-token'; // 提供默认值或处理为错误
-          const refreshToken = credentials.refresh_token || 'default-refresh-token'; // 提供默认值或处理为错误
-          // const expiresIn = credentials.expiry_date || 0; // 如果expiry_date为null或undefined，则使用0
-          // const expiresIn = 1800; //设置为30分钟
-
-          sessionManager.storeSession(userId, {
-            accessToken: accessToken,
-            createdAt: new Date(),
-            expiresIn: expiresIn_s, // 使用处理过的值
-            refreshToken: refreshToken
-          });
-
-          res.json({ accessToken: accessToken });
-
-          return;
-        } catch (error) {
-          console.error('Error refreshing token:', error);
-          res.status(401).json({ error: 'Failed to refresh token' });
-          return;
-        }
-      }
-      
-      
-      res.status(400).json({ error: 'Refresh token missing or invalid' });
-      return;
     } else if (req.method === 'POST') {
       // ... 原 app.ts 中的 POST 请求处理逻辑 ...
       const rawArgs = req.body;
       const args = JSON.parse(rawArgs);
+
+      console.log(`000000, req.body`, req.body);
 
       const userId = googleUserId || 'zhanghua.x@gmail.com'; 
 
@@ -168,20 +124,18 @@ app.use(async (req: Request, res: Response) => {
 
       if (!session) {
         // 会话不存在，生成跳转认证URL
-        // console.log(`222222`);
+        console.log(`222222, 会话不存在, 生成跳转认证URL`);
         const authUrl = buildAuthUrl();  
         res.json({ authUrl: authUrl });
         return;
       }
 
-      console.log(`333333`, session.refreshToken);
-
       if (!session || !session.accessToken || new Date() > new Date(session.createdAt.getTime() + ((session.expiresIn || 0) * 1000))) {
         // ... 其他代码 ...
-        console.log(`444444`, session.refreshToken);
+        console.log(`333333, refreshToken: `, session.refreshToken);
         if (session && session.refreshToken) {
           try {
-            console.log(`555555`, session.refreshToken);
+            console.log(`555555, try refesh: `, session.refreshToken);
             // 使用 Google Auth Library 刷新令牌
             authClient.setCredentials({
               refresh_token: session.refreshToken
@@ -207,7 +161,7 @@ app.use(async (req: Request, res: Response) => {
           }
         } else {
           // 如果没有有效的刷新令牌，需要重新授权
-          console.log(`666666`, session.refreshToken);
+          console.log(`666666, 无有效令牌，需要重新授权`, session.refreshToken);
           const authUrl = buildAuthUrl();
           res.status(401).json({ authUrl: authUrl });
           return;
@@ -230,6 +184,5 @@ app.use(async (req: Request, res: Response) => {
     }
   }  
 });
-
 
 module.exports = app;
