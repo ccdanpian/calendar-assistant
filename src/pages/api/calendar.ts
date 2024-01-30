@@ -1,9 +1,9 @@
-// import {getPluginSettingsFromRequest} from '@lobehub/chat-plugin-sdk';
 // import fetch from 'node-fetch';
 import { OAuth2Client } from 'google-auth-library';
 import { sessionManager } from './sessionManager';
 import { runner } from './_utils'; // 假设这是处理日历操作的函数
-// import { Settings } from './_types';
+
+import { getCalendarKey } from './_types';
 
 import express, { Request, Response } from 'express';
 
@@ -72,7 +72,7 @@ function buildAuthUrl() {
 }
 
 
-app.use(async (req: Request, res: Response) => {
+app.use(async (req: Request, res: Response) => {  
   try {
     if (req.path === '/api/calendar' && req.method === 'GET') {
       // ... googleAuth.ts 中的 GET 请求处理逻辑 ...
@@ -111,6 +111,9 @@ app.use(async (req: Request, res: Response) => {
 
     } else if (req.method === 'POST') {
       // ... 原 app.ts 中的 POST 请求处理逻辑 ...
+      const calendar_setting_key = getCalendarKey(req);    
+      console.log(`000000, calendar_setting_key`, calendar_setting_key);  
+
       const rawArgs = req.body;
       const args = JSON.parse(rawArgs);
 
