@@ -1,6 +1,6 @@
 import { google } from 'googleapis';
 
-import { sessionManager } from './sessionManager';
+import { sessionManager } from './dynamoDBSessionManager';
 
 // 创建 Google Calendar API 客户端
 function getGoogleCalendarClient(accessToken: string) {
@@ -134,7 +134,7 @@ async function deleteEvent(client: any, eventId: string) {
 // Runner
 export async function runner(rawArgs: any, userId: string) {
   try {
-    const session = sessionManager.getSession(userId);
+    const session = await sessionManager.getSession(userId);
     if (!session || !session.accessToken) {
       throw new Error('No valid session found');
     }
