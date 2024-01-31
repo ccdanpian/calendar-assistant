@@ -1,6 +1,7 @@
 // import fetch from 'node-fetch';
 import { OAuth2Client } from 'google-auth-library';
-import { sessionManager } from './sessionManager';
+// import { sessionManager } from './sessionManager';
+import { sessionManager } from './dynamoDBSessionManager';
 import { runner } from './_utils'; // 假设这是处理日历操作的函数
 
 import { getCalendarKey } from './_types';
@@ -65,12 +66,8 @@ app.use(async (req: Request, res: Response) => {
 
         // const expiresIn = expiresIn; //设置为30分钟
 
-        sessionManager.storeSession(userId, {
-          accessToken: accessToken,
-          createdAt: new Date(),
-          expiresIn: expiresIn_s, // 使用处理过的值
-          refreshToken: refreshToken
-        });
+        sessionManager.storeSession(userId, accessToken, new Date(), expiresIn_s, refreshToken);
+
 
         // 返回成功消息
         res.json({ message: 'Authentication successful' });
@@ -87,8 +84,8 @@ app.use(async (req: Request, res: Response) => {
       const userId = calendarUserId;
       console.log(`000000, calendar_user_id`, userId);
  
-      let session = sessionManager.getSession(userId);
-      console.log(`111111, session:`, session);
+      let session = await sessionManager.getSession(userId);
+      console.log(`111111, session:`, await session);
 
       if (!session) {
         // 会话不存在，生成跳转认证URL
@@ -112,13 +109,11 @@ app.use(async (req: Request, res: Response) => {
             const { credentials } = await authClient.refreshAccessToken();
         
             // 更新会话信息
-            sessionManager.storeSession(userId, {
-              accessToken: credentials.access_token || 'default-access-token', // 提供默认值或处理为错误,
-              createdAt: new Date(),
-              // expiresIn: credentials.expiry_date || 0, // 如果expiry_date为null或undefined，则使用0,
-              expiresIn: expiresIn_s, // 设置为30分钟
-              refreshToken: credentials.refresh_token || session.refreshToken
-            });
+            const accessToken = credentials.access_token || 'default-access-token'; // 提供默认值或处理为错误,
+            const refreshToken = credentials.refresh_token || session.refreshToken;
+            
+
+            sessionManager.storeSession(userId, accessToken, new Date(), expiresIn_s, refreshToken);
         
             // 继续处理原始请求
           } catch (error) {
@@ -131,7 +126,8 @@ app.use(async (req: Request, res: Response) => {
           // 如果没有有效的刷新令牌，需要重新授权
           console.log(`666666, 无有效令牌，需要重新授权`, session.refreshToken);
           const authUrl = buildAuthUrl();
-          res.status(401).json({ authUrl: authUrl });
+          console.log(`authUrl`, authUrl);
+          res.json({ authUrl: authUrl });
           return;
         }        
       }
