@@ -62,12 +62,12 @@ class DynamoDBSessionManager {
         const encryptedRefreshToken = await this.encryptData(refreshToken);
 
         const params = {
-            Item: {
-                UserId: userId, // 用户ID
+            Item: {                
                 AccessToken: encryptedAccessToken, // 加密后的访问令牌
                 CreatedAt: createdAtIsoString, // 创建时间
                 ExpiresIn: expiresIn, // 过期时间
                 RefreshToken: encryptedRefreshToken, // 加密后的刷新令牌
+                UserId: userId // 用户ID
             },
             TableName: this.tableName // 表名
         };
