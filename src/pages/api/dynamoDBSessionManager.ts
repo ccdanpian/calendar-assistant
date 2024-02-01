@@ -42,8 +42,8 @@ class DynamoDBSessionManager {
             // 如果CiphertextBlob未定义，抛出错误
             throw new Error('Encryption failed, CiphertextBlob is undefined.');
         }
-        // 安全地返回加密后的数据，以base64格式
-        return response.CiphertextBlob.toString('base64');
+        // 正确地将CiphertextBlob转换为Base64格式的字符串
+        return Buffer.from(response.CiphertextBlob).toString('base64');
     }
 
     // 解密数据的私有方法
@@ -59,8 +59,8 @@ class DynamoDBSessionManager {
             // 如果Plaintext未定义，抛出错误
             throw new Error('Decryption failed, Plaintext is undefined.');
         }
-        // 安全地返回解密后的原始字符串数据
-        return response.Plaintext.toString();
+        // 正确地将Plaintext（Uint8Array）转换为字符串
+        return Buffer.from(response.Plaintext).toString();
     }
 
 
