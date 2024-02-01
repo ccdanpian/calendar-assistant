@@ -22,15 +22,15 @@ class DynamoDBSessionManager {
         // Format the createdAt date to an ISO string for DynamoDB compatibility
         const createdAtIsoString = createdAt.toISOString();
     
-        const params = {
-            TableName: this.tableName,
+        const params = {            
             Item: {                
                 AccessToken: accessToken, // Stored directly as a string
                 CreatedAt: createdAtIsoString, // Date converted to ISO string format
                 ExpiresIn: expiresIn, // Assuming expiresIn_s is already in the correct format (seconds as a number)
                 RefreshToken: refreshToken, // Stored directly as a string
                 UserId: userId              
-            }
+            },
+            TableName: this.tableName
         };
     
         try {
