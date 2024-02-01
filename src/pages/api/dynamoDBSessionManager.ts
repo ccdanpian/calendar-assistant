@@ -38,7 +38,12 @@ class DynamoDBSessionManager {
         // 发送加密命令
         const command = new EncryptCommand(params);
         const response = await this.kmsClient.send(command);
-        return response.CiphertextBlob.toString('base64'); // 返回加密后的数据，以base64格式
+        if (!response.CiphertextBlob) {
+            // 如果CiphertextBlob未定义，抛出错误
+            throw new Error('Encryption failed, CiphertextBlob is undefined.');
+        }
+        // 安全地返回加密后的数据，以base64格式
+        return response.CiphertextBlob.toString('base64');
     }
 
     // 解密数据的私有方法
@@ -50,8 +55,14 @@ class DynamoDBSessionManager {
         // 发送解密命令
         const command = new DecryptCommand(params);
         const response = await this.kmsClient.send(command);
-        return response.Plaintext.toString(); // 返回解密后的原始字符串数据
+        if (!response.Plaintext) {
+            // 如果Plaintext未定义，抛出错误
+            throw new Error('Decryption failed, Plaintext is undefined.');
+        }
+        // 安全地返回解密后的原始字符串数据
+        return response.Plaintext.toString();
     }
+
 
     // 存储会话信息到DynamoDB
     async storeSession(userId: string, accessToken: string, createdAt: Date, expiresIn: number, refreshToken: string) {
