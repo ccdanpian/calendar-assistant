@@ -6,12 +6,12 @@ class DynamoDBSessionManager {
     private tableName: string;
 
     constructor() {
-        const ddbClient = new DynamoDBClient({
-            region: process.env.AWS_REGION!,
+        const ddbClient = new DynamoDBClient({            
             credentials: {
                 accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
                 secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!
-            }
+            },
+            region: process.env.AWS_REGION!
         });
 
         this.ddbDocClient = DynamoDBDocumentClient.from(ddbClient);
@@ -24,12 +24,12 @@ class DynamoDBSessionManager {
     
         const params = {
             TableName: this.tableName,
-            Item: {
-                UserId: userId,
+            Item: {                
                 AccessToken: accessToken, // Stored directly as a string
-                RefreshToken: refreshToken, // Stored directly as a string
+                CreatedAt: createdAtIsoString, // Date converted to ISO string format
                 ExpiresIn: expiresIn, // Assuming expiresIn_s is already in the correct format (seconds as a number)
-                CreatedAt: createdAtIsoString // Date converted to ISO string format
+                RefreshToken: refreshToken, // Stored directly as a string
+                UserId: userId              
             }
         };
     
@@ -44,9 +44,9 @@ class DynamoDBSessionManager {
     
 
     async getSession(userId: string) {
-        const params = {
-            TableName: this.tableName,
-            Key: { UserId: userId }
+        const params = {            
+            Key: { UserId: userId },
+            TableName: this.tableName
         };
     
         try {
@@ -55,9 +55,9 @@ class DynamoDBSessionManager {
                 // Since CreatedAt was stored as an ISO string, it can be directly used or converted back to a Date object if needed
                 const sessionData = {
                     accessToken: result.Item.AccessToken,
-                    refreshToken: result.Item.RefreshToken,
+                    createdAt: new Date(result.Item.CreatedAt), // Converting the ISO string back to a Date object
                     expiresIn: result.Item.ExpiresIn,
-                    createdAt: new Date(result.Item.CreatedAt) // Converting the ISO string back to a Date object
+                    refreshToken: result.Item.RefreshToken             
                 };
                 console.log(`Geted session for user ${userId}`, sessionData);
                 return sessionData;
@@ -70,12 +70,11 @@ class DynamoDBSessionManager {
         }
     }
     
-    
 
     async deleteSession(userId: string) {
-        const params = {
-            TableName: this.tableName,
-            Key: { UserId: userId }
+        const params = {            
+            Key: { UserId: userId },
+            TableName: this.tableName
         };
 
         try {
