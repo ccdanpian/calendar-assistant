@@ -47,7 +47,6 @@ function buildAuthUrl() {
 app.use(async (req: Request, res: Response) => {  
   try {
     if (req.path === '/api/calendar' && req.method === 'GET') {
-      // ... googleAuth.ts 中的 GET 请求处理逻辑 ...
       //检查是否是OAuth回调请求（通常带有授权码）
       const urlParams = new URL(req.url, `http://${req.headers.host}`).searchParams;
       const authorizationCode = urlParams.get('code');
