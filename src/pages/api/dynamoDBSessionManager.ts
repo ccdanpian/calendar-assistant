@@ -168,20 +168,44 @@ class DynamoDBSessionManager {
     }
 
     // 从DynamoDB删除会话信息
-    async deleteSession(userId: string) {
-        const params = {
-            Key: { UserId: userId }, // 根据用户ID进行删除
-            TableName: this.tableName // 表名
-        };
+// 从DynamoDB获取会话信息
+async getSession(userId: string) {
+    const params = {
+        Key: { UserId: userId }, // 根据用户ID查询
+        TableName: this.tableName // 表名
+    };
 
-        try {
-            await this.ddbDocClient.send(new DeleteCommand(params));
-            console.log('Session deleted successfully.');
-        } catch (error) {
-            console.error('Error deleting session:', error);
+    try {
+        const result = await this.ddbDocClient.send(new GetCommand(params));
+        if (result.Item) {
+            // 解密accessToken和refreshToken
+            console.log(`AccessToken ddd`, result.Item.AccessToken);
+            const accessToken = await this.decryptData(result.Item.AccessToken);
+            const refreshToken = await this.decryptData(result.Item.RefreshToken);
+
+            console.log(`AccessToken eee`, accessToken);
+
+            // 将UserEmail添加到sessionData中
+            const userEmail = result.Item.UserEmail ? result.Item.UserEmail : 'Email not available';
+
+            const sessionData = {
+                accessToken: accessToken, // 解密后的访问令牌
+                createdAt: new Date(result.Item.CreatedAt), // 创建时间
+                expiresIn: result.Item.ExpiresIn, // 过期时间
+                refreshToken: refreshToken, // 解密后的刷新令牌
+                userEmail: userEmail, // 用户邮箱
+            };
+            console.log(`Session retrieved for user ${userId}`, sessionData);
+            return sessionData;
+        } else {
+            return null;
         }
+    } catch (error) {
+        console.error('Error retrieving session:', error);
+        return null;
     }
 }
+
 
 // 导出DynamoDBSessionManager实例
 export const sessionManager = new DynamoDBSessionManager();
