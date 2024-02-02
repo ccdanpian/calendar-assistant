@@ -64,33 +64,75 @@ class DynamoDBSessionManager {
     }
 
 
-    // 存储会话信息到DynamoDB
-    async storeSession(userId: string, accessToken: string, createdAt: Date, expiresIn: number, refreshToken: string) {
-        const createdAtIsoString = createdAt.toISOString(); // 将创建时间转换为ISO格式的字符串
+// 如果userId不同，通过userEmail删除会话
+async deleteSessionByEmailIfUserIdDiffers(userId: string, userEmail: string) {
+    // 使用UserEmail作为查询条件的GSI进行查询
+    const queryParams = {
+        IndexName: 'UserEmailIndex', // 您的GSI名称
+        TableName: this.tableName,
+        KeyConditionExpression: 'UserEmail = :userEmail',
+        ExpressionAttributeValues: {
+            ':userEmail': userEmail
+        },
+    };
 
-        // 先加密accessToken和refreshToken
-        const encryptedAccessToken = await this.encryptData(accessToken);
-        const encryptedRefreshToken = await this.encryptData(refreshToken);
-
-        const params = {
-            Item: {                
-                AccessToken: encryptedAccessToken, // 加密后的访问令牌
-                CreatedAt: createdAtIsoString, // 创建时间
-                ExpiresIn: expiresIn, // 过期时间
-                RefreshToken: encryptedRefreshToken, // 加密后的刷新令牌
-                UserId: userId // 用户ID
-            },
-            TableName: this.tableName // 表名
-        };
-
-        // 尝试将会话信息存储到DynamoDB
-        try {
-            await this.ddbDocClient.send(new PutCommand(params));
-            console.log('Session stored successfully.');
-        } catch (error) {
-            console.error('Error storing session:', error);
+    try {
+        // 查询现有会话
+        const result = await this.ddbDocClient.send(new QueryCommand(queryParams));
+        if (result.Items) {
+            result.Items.forEach(async (item) => {
+                if (item.UserId !== userId) {
+                    // 如果找到的UserId与新的UserId不同，则删除
+                    const deleteParams = {
+                        TableName: this.tableName,
+                        Key: { UserId: item.UserId }
+                    };
+                    await this.ddbDocClient.send(new DeleteCommand(deleteParams));
+                    console.log(`Session for user ${item.UserId} deleted due to new session creation.`);
+                }
+            });
         }
+    } catch (error) {
+        console.error('Error in deleting session by email if user ID differs:', error);
     }
+}
+
+
+    // 存储会话信息到DynamoDB
+// 存储会话信息到DynamoDB
+async storeSession(userId: string, accessToken: string, createdAt: Date, expiresIn: number, refreshToken: string, userEmail: string) {
+    const createdAtIsoString = createdAt.toISOString(); // 将创建时间转换为ISO格式的字符串
+
+    // 先加密accessToken和refreshToken
+    const encryptedAccessToken = await this.encryptData(accessToken);
+    const encryptedRefreshToken = await this.encryptData(refreshToken);
+
+
+// 修改前的准备调用
+await this.deleteSessionByEmailIfUserIdDiffers(userId, userEmail);
+
+
+    const params = {
+        Item: {                
+            AccessToken: encryptedAccessToken, // 加密后的访问令牌
+            CreatedAt: createdAtIsoString, // 创建时间
+            ExpiresIn: expiresIn, // 过期时间
+            RefreshToken: encryptedRefreshToken, // 加密后的刷新令牌
+            UserId: userId, // 用户ID
+            UserEmail: userEmail // 用户邮箱
+        },
+        TableName: this.tableName // 表名
+    };
+
+    // 尝试将会话信息存储到DynamoDB
+    try {
+        await this.ddbDocClient.send(new PutCommand(params));
+        console.log('Session stored successfully.');
+    } catch (error) {
+        console.error('Error storing session:', error);
+    }
+}
+
 
     // 从DynamoDB获取会话信息
     async getSession(userId: string) {
