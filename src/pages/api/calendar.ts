@@ -140,9 +140,11 @@ app.use(async (req: Request, res: Response) => {
             // 更新会话信息
             const accessToken = credentials.access_token || 'default-access-token'; // 提供默认值或处理为错误,
             const refreshToken = credentials.refresh_token || session.refreshToken;
-            
 
-            sessionManager.storeSession(userId, accessToken, new Date(), expiresIn_s, refreshToken);
+            // 从 OAuth 提供的信息中获取用户身份
+            const userEmail = await extractUserIdFromOAuth(accessToken);// 这里需要实现 extractUserIdFromOAuth 函数
+
+            sessionManager.storeSession(userId, accessToken, new Date(), expiresIn_s, refreshToken, userEmail);
         
             // 继续处理原始请求
           } catch (error) {
