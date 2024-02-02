@@ -68,12 +68,12 @@ class DynamoDBSessionManager {
     async deleteSessionByEmailIfUserIdDiffers(userId: string, userEmail: string) {
         // 使用UserEmail作为查询条件的GSI进行查询
         const queryParams = {
-            IndexName: 'UserEmailIndex', // 您的GSI名称
-            TableName: this.tableName,
-            KeyConditionExpression: 'UserEmail = :userEmail',
             ExpressionAttributeValues: {
                 ':userEmail': userEmail
             },
+            IndexName: 'UserEmailIndex', // 您的GSI名称
+            KeyConditionExpression: 'UserEmail = :userEmail',
+            TableName: this.tableName,           
         };
     
         try {
@@ -83,9 +83,9 @@ class DynamoDBSessionManager {
                 result.Items.forEach(async (item) => {
                     if (item.UserId !== userId) {
                         // 如果找到的UserId与新的UserId不同，则删除
-                        const deleteParams = {
-                            TableName: this.tableName,
-                            Key: { UserId: item.UserId }
+                        const deleteParams = {                            
+                            Key: { UserId: item.UserId },
+                            TableName: this.tableName
                         };
                         await this.ddbDocClient.send(new DeleteCommand(deleteParams));
                         console.log(`Session for user ${item.UserId} deleted due to new session creation.`);
@@ -116,9 +116,9 @@ class DynamoDBSessionManager {
                 AccessToken: encryptedAccessToken, // 加密后的访问令牌
                 CreatedAt: createdAtIsoString, // 创建时间
                 ExpiresIn: expiresIn, // 过期时间
-                RefreshToken: encryptedRefreshToken, // 加密后的刷新令牌
-                UserId: userId, // 用户ID
-                UserEmail: userEmail // 用户邮箱
+                RefreshToken: encryptedRefreshToken, // 加密后的刷新令牌                
+                UserEmail: userEmail, // 用户邮箱
+                UserId: userId // 用户ID
             },
             TableName: this.tableName // 表名
         };
