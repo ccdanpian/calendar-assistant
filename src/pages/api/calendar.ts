@@ -142,7 +142,7 @@ app.use(async (req: Request, res: Response) => {
             const refreshToken = credentials.refresh_token || session.refreshToken;
 
             // 从 OAuth 提供的信息中获取用户身份
-            const userEmail = seesion.userEmail;// 这里需要实现 extractUserIdFromOAuth 函数
+            const userEmail = session.userEmail;// 这里需要实现 extractUserIdFromOAuth 函数
 
             await sessionManager.storeSession(userId, accessToken, new Date(), expiresIn_s, refreshToken, userEmail);
         
