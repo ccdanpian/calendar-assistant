@@ -1,6 +1,6 @@
 // 引入AWS SDK中与DynamoDB和KMS相关的模块
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand, GetCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, PutCommand, GetCommand, DeleteCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { KMSClient, EncryptCommand, DecryptCommand } from "@aws-sdk/client-kms";
 
 // 定义一个类来管理DynamoDB中的用户会话
