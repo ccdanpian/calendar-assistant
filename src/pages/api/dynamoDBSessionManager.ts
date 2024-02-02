@@ -71,7 +71,7 @@ class DynamoDBSessionManager {
             ExpressionAttributeValues: {
                 ':userEmail': userEmail
             },
-            IndexName: 'UserEmail', // 您的GSI名称
+            IndexName: 'UserEmail-index', // 您的GSI名称
             KeyConditionExpression: 'UserEmail = :userEmail',
             TableName: this.tableName,           
         };
@@ -79,19 +79,21 @@ class DynamoDBSessionManager {
         try {
             // 查询现有会话
             const result = await this.ddbDocClient.send(new QueryCommand(queryParams));
-            if (result.Items) {
-                result.Items.forEach(async (item) => {
-                    if (item.UserId !== userId) {
-                        // 如果找到的UserId与新的UserId不同，则删除
-                        const deleteParams = {                            
-                            Key: { UserId: item.UserId },
-                            TableName: this.tableName
-                        };
-                        await this.ddbDocClient.send(new DeleteCommand(deleteParams));
-                        console.log(`Session for user ${item.UserId} deleted due to new session creation.`);
-                    }
+            console.log(`Sessions query for differing UserIds.`);
+            const deletePromises = result.Items.filter(item => item.UserId !== userId)
+                .map(async (item) => {
+                    const deleteParams = {
+                        Key: {
+                            UserId: item.UserId, // 分区键
+                            UserEmail: item.UserEmail // 确保这里正确获取UserEmail作为排序键
+                        },
+                        TableName: this.tableName
+                    };
+                    return this.ddbDocClient.send(new DeleteCommand(deleteParams));
                 });
-            }
+        
+            await Promise.all(deletePromises);
+            console.log(`Sessions deleted for differing UserIds.`);
         } catch (error) {
             console.error('Error in deleting session by email if user ID differs:', error);
         }
@@ -171,7 +173,7 @@ class DynamoDBSessionManager {
             return null;
         }
     }
-}
 
+}
 // 导出DynamoDBSessionManager实例
 export const sessionManager = new DynamoDBSessionManager();
