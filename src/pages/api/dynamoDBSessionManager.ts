@@ -133,39 +133,6 @@ class DynamoDBSessionManager {
     }
 
 
-    // 从DynamoDB获取会话信息
-    async getSession(userId: string) {
-        const params = {
-            Key: { UserId: userId }, // 根据用户ID查询
-            TableName: this.tableName // 表名
-        };
-
-        try {
-            const result = await this.ddbDocClient.send(new GetCommand(params));
-            if (result.Item) {
-                // 解密accessToken和refreshToken
-                console.log(`AccessToken ddd`, result.Item.AccessToken);
-                const accessToken = await this.decryptData(result.Item.AccessToken);
-                const refreshToken = await this.decryptData(result.Item.RefreshToken);
-
-                console.log(`AccessToken eee`, accessToken);
-
-                const sessionData = {
-                    accessToken: accessToken, // 解密后的访问令牌
-                    createdAt: new Date(result.Item.CreatedAt), // 创建时间
-                    expiresIn: result.Item.ExpiresIn, // 过期时间
-                    refreshToken: refreshToken, // 解密后的刷新令牌
-                };
-                console.log(`Session retrieved for user ${userId}`, sessionData);
-                return sessionData;
-            } else {
-                return null;
-            }
-        } catch (error) {
-            console.error('Error retrieving session:', error);
-            return null;
-        }
-    }
 
     // 从DynamoDB获取会话信息
     async getSession(userId: string) {
