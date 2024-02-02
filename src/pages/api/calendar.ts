@@ -59,8 +59,8 @@ app.use(async (req: Request, res: Response) => {
         // 存储用户会话
         // 从 OAuth 提供的信息中获取用户身份
         //const userId = await extractUserIdFromOAuth(tokens);// 这里需要实现 extractUserIdFromOAuth 函数
-        calendarUserId = await getCalendarKey(req);
-        console.log(`xxxxx, 此id无任何信息，需要授权, calendar_user_id`, userId);
+        // calendarUserId = await getCalendarKey(req);
+        console.log(`xxxxx, 此id无任何信息，需要授权, calendar_user_id`, calendarUserId);
         const userId = calendarUserId;
         const accessToken = tokens.access_token || 'no-access-token'; // 提供默认值或处理为错误
         const refreshToken = tokens.refresh_token || 'no-refresh-token'; // 提供默认值或处理为错误
