@@ -23,6 +23,34 @@ let calendarUserId: string = '';
 // 创建OAuth2Client实例
 const authClient = new OAuth2Client(googleClientId, googleClientSecret, googleRedirectUri);
 
+// 使用 Google OAuth2Client 解码 ID 令牌
+async function decodeIdToken(idToken: string): Promise<any> {
+  const client = new OAuth2Client();
+  const ticket = await client.verifyIdToken({
+    audience: googleClientId,  // 指定您的 Google OAuth 2.0 客户端 ID
+    idToken: idToken,    
+  });
+  return ticket.getPayload();
+}
+
+// 从 OAuth 令牌中提取用户的Email
+async function extractUserIdFromOAuth(tokens: any): Promise<string> {
+  if (tokens && tokens.id_token) {
+    try {
+      const decodedIdToken = await decodeIdToken(tokens.id_token);
+      console.log('decodeIdToken', decodedIdToken);
+      return decodedIdToken.email; // 使用解码后的 ID 令牌中的电子邮件地址
+    } catch (error) {
+      const message = (error as Error).message;
+      console.error(message);
+      throw new Error('Error decoding ID token: ' + message);
+    }    
+  } else {
+    throw new Error('No ID token found in OAuth tokens');
+  }
+}
+
+// 构建授权链接
 function buildAuthUrl() {
   const authEndpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
 
