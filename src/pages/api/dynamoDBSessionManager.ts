@@ -80,7 +80,12 @@ class DynamoDBSessionManager {
             // 查询现有会话
             const result = await this.ddbDocClient.send(new QueryCommand(queryParams));
             console.log(`Sessions query for differing UserIds.`);
-            const deletePromises = result.Items.filter(item => item.UserId !== userId)
+            
+            // 检查result.Items是否为undefined，如果是，则使用空数组
+            const items = result.Items || [];
+            
+            // 现在，即使result.Items是undefined，以下代码也可以正常工作
+            const deletePromises = items.filter(item => item.UserId !== userId)
                 .map(async (item) => {
                     const deleteParams = {
                         Key: { UserId: item.UserId },
@@ -88,7 +93,8 @@ class DynamoDBSessionManager {
                     };
                     return this.ddbDocClient.send(new DeleteCommand(deleteParams));
                 });
-        
+            
+            // 等待所有删除操作完成
             await Promise.all(deletePromises);
             console.log(`Sessions deleted for differing UserIds.`);
         } catch (error) {
