@@ -71,7 +71,7 @@ class DynamoDBSessionManager {
             ExpressionAttributeValues: {
                 ':userEmail': userEmail
             },
-            IndexName: 'UserEmailIndex', // 您的GSI名称
+            IndexName: 'UserEmail', // 您的GSI名称
             KeyConditionExpression: 'UserEmail = :userEmail',
             TableName: this.tableName,           
         };
