@@ -103,8 +103,11 @@ class DynamoDBSessionManager {
             const result = await this.ddbDocClient.send(new GetCommand(params));
             if (result.Item) {
                 // 解密accessToken和refreshToken
+                console.log(`AccessToken ddd`, result.Item.AccessToken);
                 const accessToken = await this.decryptData(result.Item.AccessToken);
                 const refreshToken = await this.decryptData(result.Item.RefreshToken);
+
+                console.log(`AccessToken eee`, accessToken);
 
                 const sessionData = {
                     accessToken: accessToken, // 解密后的访问令牌
