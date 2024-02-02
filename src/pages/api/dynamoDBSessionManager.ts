@@ -171,7 +171,7 @@ class DynamoDBSessionManager {
             return null;
         }
     }
-
+}
 
 // 导出DynamoDBSessionManager实例
 export const sessionManager = new DynamoDBSessionManager();
