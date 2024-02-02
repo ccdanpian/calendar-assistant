@@ -67,7 +67,7 @@ app.use(async (req: Request, res: Response) => {
 
         // const expiresIn = expiresIn; //设置为30分钟
 
-        sessionManager.storeSession(userId, accessToken, new Date(), expiresIn_s, refreshToken);
+        await sessionManager.storeSession(userId, accessToken, new Date(), expiresIn_s, refreshToken);
 
 
         // 返回成功消息
