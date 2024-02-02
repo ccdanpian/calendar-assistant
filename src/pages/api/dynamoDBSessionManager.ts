@@ -83,10 +83,7 @@ class DynamoDBSessionManager {
             const deletePromises = result.Items.filter(item => item.UserId !== userId)
                 .map(async (item) => {
                     const deleteParams = {
-                        Key: {
-                            UserId: item.UserId, // 分区键
-                            UserEmail: item.UserEmail // 确保这里正确获取UserEmail作为排序键
-                        },
+                        Key: { UserId: item.UserId },
                         TableName: this.tableName
                     };
                     return this.ddbDocClient.send(new DeleteCommand(deleteParams));
