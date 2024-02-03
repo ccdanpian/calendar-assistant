@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日程管理API - 使用指南</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .navbar {
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 15px 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #007bff;
+        }
+        p {
+            line-height: 1.6;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #f1f1f1;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">日程管理API</div>
+    <div class="container">
+        <h1>欢迎使用日程管理API</h1>
+        <p>这个API可以帮助您轻松管理您的日程安排，包括添加、查询、更新和删除日程事件。</p>
+        
+        
+        <h2>功能介绍</h2>
+        <ul>
+            <li><strong>添加日程：</strong>您可以添加新的日程到您的日历中。</li>
+            <li><strong>查询日程：</strong>您可以查看特定时间范围内的所有日程。</li>
+            <li><strong>删除日程：</strong>您可以删除不再需要的日程。</li>
+        </ul>
+        
+        <h2>开始使用</h2>
+        <p>要开始使用日程管理API，请首先在<a href="https://github.com/lobehub/lobe-chat">lobechat</a>中安装此插件。
+            <br>在使用本API之前，您需要确保已经在lobe chat工具中完成了授权。这将允许API访问您的日历数据。</p>
+        <h2>隐私说明</h2>
+        <p>在使用日程管理API时，您需要提供一个Calendar Key用于标识您的日历数据。这个Calendar Key只会存储在您的设备上，并且不会被传送到任何其他地方。</p>
+        <p>此外，您的邮箱和Google Calendar API的token也会被使用，但这些信息不会被日程管理API获取、存储或传输到任何地方。所有的用户数据都会经过加密并且存储在第三方数据库服务器中，以确保您的隐私安全。</p>
+     </div>
+    <div class="footer">
+        如果您在使用过程中遇到任何问题，请随时<a href="#">联系我们</a>。
+    </div>
+</body>
+</html>
