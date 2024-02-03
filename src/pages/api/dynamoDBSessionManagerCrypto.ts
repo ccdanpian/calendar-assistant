@@ -1,7 +1,7 @@
 // 引入AWS SDK中与DynamoDB和KMS相关的模块
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand, DeleteCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
-import { KMSClient, DecryptCommand } from "@aws-sdk/client-kms";
+// import { KMSClient, DecryptCommand } from "@aws-sdk/client-kms";
 const crypto = require('crypto');
 
 // 假设您已经有了加密密钥和初始化向量（IV），这些值应该安全地存储和管理
@@ -12,9 +12,9 @@ const IV = process.env.IV || 'your_initialization_vector'; // IV应该是16位�
 // 定义一个类来管理DynamoDB中的用户会话
 class DynamoDBSessionManager {
     private ddbDocClient: DynamoDBDocumentClient; // DynamoDB文档客户端
-    private kmsClient: KMSClient; // KMS客户端
+    // private kmsClient: KMSClient; // KMS客户端
     private tableName: string; // DynamoDB表名
-    private kmsKeyId: string; // 用于加密/解密的KMS密钥ID
+    // private kmsKeyId: string; // 用于加密/解密的KMS密钥ID
 
     // 类构造函数
     constructor() {
@@ -30,8 +30,8 @@ class DynamoDBSessionManager {
         // 从DynamoDB客户端创建文档客户端
         this.ddbDocClient = DynamoDBDocumentClient.from(ddbClient);
         this.tableName = process.env.DYNAMODB_SESSION_TABLE!; // 从环境变量读取DynamoDB表名
-        this.kmsKeyId = process.env.AWS_KMS_KEY_ID!; // 从环境变量读取KMS密钥ID
-        this.kmsClient = new KMSClient({ region: process.env.AWS_REGION! }); // 初始化KMS客户端
+        // this.kmsKeyId = process.env.AWS_KMS_KEY_ID!; // 从环境变量读取KMS密钥ID
+        // this.kmsClient = new KMSClient({ region: process.env.AWS_REGION! }); // 初始化KMS客户端
     }
 
     // 使用crypto模块重写的加密数据的私有方法
