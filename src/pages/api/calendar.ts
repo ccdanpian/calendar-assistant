@@ -1,7 +1,7 @@
 // import fetch from 'node-fetch';
 import { OAuth2Client } from 'google-auth-library';
 // import { sessionManager } from './sessionManager';
-import { sessionManager } from './dynamoDBSessionManager';
+import { sessionManager } from './dynamoDBSessionManagerCrypto';
 import { runner } from './_utils'; // 假设这是处理日历操作的函数
 
 import { getCalendarKey } from './_types';
