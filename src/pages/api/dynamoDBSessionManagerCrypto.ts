@@ -4,10 +4,11 @@ import { DynamoDBDocumentClient, PutCommand, GetCommand, DeleteCommand, QueryCom
 // import { KMSClient, DecryptCommand } from "@aws-sdk/client-kms";
 import crypto from 'node:crypto';
 
+
 // 假设您已经有了加密密钥和初始化向量（IV），这些值应该安全地存储和管理
 // 以下是示例值，请替换为您自己的密钥和IV
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'your_secret_encryption_key'; // 确保这个密钥是32位的
-const IV = process.env.IV || 'your_initialization_vector'; // IV应该是16位的
+// const IV = process.env.IV || 'your_initialization_vector'; // IV应该是16位的
 
 // 定义一个类来管理DynamoDB中的用户会话
 class DynamoDBSessionManager {
@@ -36,7 +37,9 @@ class DynamoDBSessionManager {
 
     // 使用crypto模块重写的加密数据的私有方法
     private async encryptData(data: string): Promise<string> {
-        let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), IV);
+        const iv = Buffer.alloc(16, 0); // Initialization vector.
+        const key = crypto.scryptSync(ENCRYPTION_KEY, "salt", 32);
+        let cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
         let encrypted = cipher.update(data);
         encrypted = Buffer.concat([encrypted, cipher.final()]);
         return encrypted.toString('base64'); // 将加密后的数据转换为Base64格式的字符串
@@ -44,8 +47,11 @@ class DynamoDBSessionManager {
 
     // 使用crypto模块重写的解密数据的私有方法
     private async decryptData(ciphertextBlob: string): Promise<string> {
+        const iv = Buffer.alloc(16, 0); // Initialization vector.
+        const key = crypto.scryptSync(ENCRYPTION_KEY, "salt", 32);
+
         let encryptedText = Buffer.from(ciphertextBlob, 'base64'); // 将加密数据从Base64格式转换为Buffer
-        let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), IV);
+        let decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
         let decrypted = decipher.update(encryptedText);
         decrypted = Buffer.concat([decrypted, decipher.final()]);
         return decrypted.toString(); // 将解密后的数据转换为字符串
