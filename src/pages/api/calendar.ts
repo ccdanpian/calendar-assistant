@@ -23,6 +23,34 @@ let calendarUserId: string = '';
 // 创建OAuth2Client实例
 const authClient = new OAuth2Client(googleClientId, googleClientSecret, googleRedirectUri);
 
+// 使用 Google OAuth2Client 解码 ID 令牌
+async function decodeIdToken(idToken: string): Promise<any> {
+  const client = new OAuth2Client();
+  const ticket = await client.verifyIdToken({
+    audience: googleClientId,  // 指定您的 Google OAuth 2.0 客户端 ID
+    idToken: idToken,    
+  });
+  return ticket.getPayload();
+}
+
+// 从 OAuth 令牌中提取用户的Email
+async function extractUserIdFromOAuth(tokens: any): Promise<string> {
+  if (tokens && tokens.id_token) {
+    try {
+      const decodedIdToken = await decodeIdToken(tokens.id_token);
+      console.log('decodeIdToken', decodedIdToken);
+      return decodedIdToken.email; // 使用解码后的 ID 令牌中的电子邮件地址
+    } catch (error) {
+      const message = (error as Error).message;
+      console.error(message);
+      throw new Error('Error decoding ID token: ' + message);
+    }    
+  } else {
+    throw new Error('No ID token found in OAuth tokens');
+  }
+}
+
+// 构建授权链接
 function buildAuthUrl() {
   const authEndpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
 
@@ -58,14 +86,16 @@ app.use(async (req: Request, res: Response) => {
 
         // 存储用户会话
         // 从 OAuth 提供的信息中获取用户身份
-        //const userId = await extractUserIdFromOAuth(tokens);// 这里需要实现 extractUserIdFromOAuth 函数
+        const userEmail = await extractUserIdFromOAuth(tokens);// 这里需要实现 extractUserIdFromOAuth 函数
+
+        console.log(`xxxxx, 此id无任何信息，需要授权, calendar_user_id`, calendarUserId);
         const userId = calendarUserId;
         const accessToken = tokens.access_token || 'no-access-token'; // 提供默认值或处理为错误
         const refreshToken = tokens.refresh_token || 'no-refresh-token'; // 提供默认值或处理为错误
 
         // const expiresIn = expiresIn; //设置为30分钟
 
-        sessionManager.storeSession(userId, accessToken, new Date(), expiresIn_s, refreshToken);
+        await sessionManager.storeSession(userId, accessToken, new Date(), expiresIn_s, refreshToken, userEmail);
 
 
         // 返回成功消息
@@ -110,9 +140,11 @@ app.use(async (req: Request, res: Response) => {
             // 更新会话信息
             const accessToken = credentials.access_token || 'default-access-token'; // 提供默认值或处理为错误,
             const refreshToken = credentials.refresh_token || session.refreshToken;
-            
 
-            sessionManager.storeSession(userId, accessToken, new Date(), expiresIn_s, refreshToken);
+            // 从 OAuth 提供的信息中获取用户身份
+            const userEmail = session.userEmail;// 这里需要实现 extractUserIdFromOAuth 函数
+
+            await sessionManager.storeSession(userId, accessToken, new Date(), expiresIn_s, refreshToken, userEmail);
         
             // 继续处理原始请求
           } catch (error) {
