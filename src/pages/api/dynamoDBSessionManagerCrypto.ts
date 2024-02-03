@@ -2,6 +2,12 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand, DeleteCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { KMSClient, EncryptCommand, DecryptCommand } from "@aws-sdk/client-kms";
+const crypto = require('crypto');
+
+// 假设您已经有了加密密钥和初始化向量（IV），这些值应该安全地存储和管理
+// 以下是示例值，请替换为您自己的密钥和IV
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'your_secret_encryption_key'; // 确保这个密钥是32位的
+const IV = process.env.IV || 'your_initialization_vector'; // IV应该是16位的
 
 // 定义一个类来管理DynamoDB中的用户会话
 class DynamoDBSessionManager {
@@ -28,39 +34,21 @@ class DynamoDBSessionManager {
         this.kmsClient = new KMSClient({ region: process.env.AWS_REGION! }); // 初始化KMS客户端
     }
 
-    // 加密数据的私有方法
+    // 使用crypto模块重写的加密数据的私有方法
     private async encryptData(data: string): Promise<string> {
-        const params = {
-            KeyId: this.kmsKeyId, // 使用KMS密钥ID
-            Plaintext: Buffer.from(data) // 将数据转换为Buffer
-        };
-
-        // 发送加密命令
-        const command = new EncryptCommand(params);
-        const response = await this.kmsClient.send(command);
-        if (!response.CiphertextBlob) {
-            // 如果CiphertextBlob未定义，抛出错误
-            throw new Error('Encryption failed, CiphertextBlob is undefined.');
-        }
-        // 正确地将CiphertextBlob转换为Base64格式的字符串
-        return Buffer.from(response.CiphertextBlob).toString('base64');
+        let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), IV);
+        let encrypted = cipher.update(data);
+        encrypted = Buffer.concat([encrypted, cipher.final()]);
+        return encrypted.toString('base64'); // 将加密后的数据转换为Base64格式的字符串
     }
 
-    // 解密数据的私有方法
+    // 使用crypto模块重写的解密数据的私有方法
     private async decryptData(ciphertextBlob: string): Promise<string> {
-        const params = {
-            CiphertextBlob: Buffer.from(ciphertextBlob, 'base64') // 将加密数据从base64格式转换为Buffer
-        };
-
-        // 发送解密命令
-        const command = new DecryptCommand(params);
-        const response = await this.kmsClient.send(command);
-        if (!response.Plaintext) {
-            // 如果Plaintext未定义，抛出错误
-            throw new Error('Decryption failed, Plaintext is undefined.');
-        }
-        // 正确地将Plaintext（Uint8Array）转换为字符串
-        return Buffer.from(response.Plaintext).toString();
+        let encryptedText = Buffer.from(ciphertextBlob, 'base64'); // 将加密数据从Base64格式转换为Buffer
+        let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), IV);
+        let decrypted = decipher.update(encryptedText);
+        decrypted = Buffer.concat([decrypted, decipher.final()]);
+        return decrypted.toString(); // 将解密后的数据转换为字符串
     }
 
 
