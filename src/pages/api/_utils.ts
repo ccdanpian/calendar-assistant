@@ -85,11 +85,7 @@ async function listEvents(client: any, searchParams: any) {
       timeMax: formattedTimeMax,
       timeMin: formattedTimeMin,
     });
-    if (events.data.items.length === 0) {
-      return '没有找到任何日程';
-    } else {
-      return events.data.items;
-    }
+    return events.data.items.length === 0 ? '没有找到任何日程' : events.data.items;
   } catch (error) {
     console.error('Error fetching events:', error);
     throw error;
