@@ -1,7 +1,7 @@
 // 引入AWS SDK中与DynamoDB和KMS相关的模块
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand, DeleteCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
-import { KMSClient, EncryptCommand, DecryptCommand } from "@aws-sdk/client-kms";
+import { KMSClient, DecryptCommand } from "@aws-sdk/client-kms";
 const crypto = require('crypto');
 
 // 假设您已经有了加密密钥和初始化向量（IV），这些值应该安全地存储和管理
