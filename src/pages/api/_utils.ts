@@ -1,6 +1,6 @@
 import { google } from 'googleapis';
 
-import { sessionManager } from './dynamoDBSessionManager';
+import { sessionManager } from './dynamoDBSessionManagerCrypto';
 
 // 创建 Google Calendar API 客户端
 function getGoogleCalendarClient(accessToken: string) {
@@ -85,7 +85,11 @@ async function listEvents(client: any, searchParams: any) {
       timeMax: formattedTimeMax,
       timeMin: formattedTimeMin,
     });
-    return events.data.items;
+    if (events.data.items.length === 0) {
+      return '没有找到任何日程';
+    } else {
+      return events.data.items;
+    }
   } catch (error) {
     console.error('Error fetching events:', error);
     throw error;
