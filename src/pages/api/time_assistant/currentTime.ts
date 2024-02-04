@@ -8,7 +8,7 @@ const app = express();
 app.use(express.json());
 
 // 设置POST路由来处理时间请求
-app.post('/api/time_assistant', async (req, res) => {
+app.post('/api/time_assistant', async (req: Request, res: Response) => {  
   try {
     // 确保只处理 POST 请求
     if (req.method !== 'POST') {
