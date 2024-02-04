@@ -1,5 +1,6 @@
-const express = require('express');
 const moment = require('moment-timezone');
+
+import express, { Request, Response } from 'express';
 
 const app = express();
 
