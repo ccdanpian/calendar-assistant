@@ -1,5 +1,4 @@
 const express = require('express');
-const { createErrorResponse } = require('@lobehub/chat-plugin-sdk');
 const moment = require('moment-timezone');
 
 const app = express();
@@ -8,11 +7,11 @@ const app = express();
 app.use(express.json());
 
 // 设置POST路由来处理时间请求
-app.post('/api/time_assistant', async (req: Request, res: Response) => {  
+app.post('/api/time_assistant', async (req: Request, res: Response) => {
   try {
     // 确保只处理 POST 请求
     if (req.method !== 'POST') {
-      return res.status(405).json(createErrorResponse(PluginErrorType.MethodNotAllowed));
+      return res.status(405).json({ error: 'Method not allowed' });
     }
 
     // 获取请求参数
@@ -36,6 +35,12 @@ app.post('/api/time_assistant', async (req: Request, res: Response) => {
     res.json(responseData);
   } catch (error) {
     // 如果有错误，返回错误响应
-    res.status(500).json(createErrorResponse(PluginErrorType.InternalServerError));
+    res.status(500).json({ error: 'Internal server error' });
   }
+});
+
+// 启动服务器
+const port = 3000; // 您可以选择任何可用的端口
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
