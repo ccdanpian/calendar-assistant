@@ -1,5 +1,5 @@
 const express = require('express');
-const { createErrorResponse, PluginErrorType } = require('@lobehub/chat-plugin-sdk');
+const { createErrorResponse } = require('@lobehub/chat-plugin-sdk');
 const moment = require('moment-timezone');
 
 const app = express();
