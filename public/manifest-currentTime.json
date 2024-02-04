@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@lobehub/chat-plugin-sdk/schema.json",
   "api": [
     {
-      "url": "https://www.ccalendar.space/api/time_assistant/currentTime",
+      "url": "https://www.ccalendar.space/api/currentTime",
       "name": "getCurrentTime",
       "description": "获取当前时间，格式为年-月-日 时:分:秒，并记住这个时间作为系统时间",
       "parameters": {
