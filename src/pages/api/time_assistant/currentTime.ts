@@ -30,7 +30,7 @@ app.post('/api/time_assistant', async (req: Request, res: Response) => {
 
     // 发送响应
     res.json(responseData);
-  } catch (error) {
+  } catch {
     // 如果有错误，返回错误响应
     res.status(500).json({ error: 'Internal server error' });
   }
