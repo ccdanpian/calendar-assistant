@@ -16,7 +16,7 @@ app.post('/api/time_assistant', async (req, res) => {
     }
 
     // 获取请求参数
-    const { timezone = 'Asia/Shanghai' } = req.body;
+    const args = req.body;
 
     // 检查时区参数是否存在，如果不存在，则使用北京时间时区作为默认值
     const timezone = args.timezone || 'Asia/Shanghai';
