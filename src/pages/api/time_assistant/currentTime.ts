@@ -1,13 +1,8 @@
-const express = require('express');
-const moment = require('moment-timezone');
+// pages/api/time_assistant/currentTime.ts
+import { getCurrentTime } from '@lobehub/chat-plugin-sdk';
+import moment from 'moment-timezone';
 
-const app = express();
-
-// 解析JSON请求体
-app.use(express.json());
-
-// 设置POST路由来处理时间请求
-app.post('/api/time_assistant', async (req: Request, res: Response) => {
+export default async (req, res) => {
   try {
     // 确保只处理 POST 请求
     if (req.method !== 'POST') {
@@ -37,10 +32,4 @@ app.post('/api/time_assistant', async (req: Request, res: Response) => {
     // 如果有错误，返回错误响应
     res.status(500).json({ error: 'Internal server error' });
   }
-});
-
-// 启动服务器
-const port = 3000; // 您可以选择任何可用的端口
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+};
