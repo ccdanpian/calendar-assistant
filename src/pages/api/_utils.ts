@@ -87,27 +87,25 @@ async function listEvents(client: any, calendarId: any, searchParams: any) {
         timeMin: formattedTimeMin,
       });
       
-      if (events.data.items.length === 0) {
+      if (events.length === 0) {
           return '没有找到任何日程';
-      } else {
-          // 转换每个事件的开始和结束时间为当地时间
-          const convertedEvents = events.data.items.map(event => {
-              // 检查并使用事件的时区信息，如果没有提供时区，默认使用'UTC'
-              const timeZone = event.start.timeZone || 'UTC';
-  
-              // 使用moment-timezone转换开始时间和结束时间
-              const startDateTimeLocal = moment.tz(event.start.dateTime, timeZone).format();
-              const endDateTimeLocal = moment.tz(event.end.dateTime, timeZone).format();
-              
-              // 更新事件对象的时间信息
-              event.start.dateTime = startDateTimeLocal;
-              event.end.dateTime = endDateTimeLocal;
-              
-              return event;
+        } else {
+          const convertedEvents = events.map((event: any) => {
+            const startDateTimeLocal = moment.tz(event.start.dateTime, event.start.timeZone || 'UTC').format();
+            const endDateTimeLocal = moment.tz(event.end.dateTime, event.end.timeZone || 'UTC').format();
+        
+            // 使用类型断言来告诉TypeScript编译器关于event对象的期望结构
+            const convertedEvent = {
+              ...event, 
+              start: { ...event.start, dateTime: startDateTimeLocal },
+              end: { ...event.end, dateTime: endDateTimeLocal },
+            } as GoogleCalendarEvent; // 假设GoogleCalendarEvent是您的目标结构
+        
+            return convertedEvent;
           });
-  
+        
           return convertedEvents;
-      }
+        }
   } catch (error) {
       console.error("获取日程时发生错误:", error);
       return '获取日程时发生错误';
