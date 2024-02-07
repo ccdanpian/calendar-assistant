@@ -41,17 +41,17 @@ function convertToRunnerArgs(data: any) {
 }
 
 // for list
-interface SimplifiedGoogleCalendarEvent {
-  summary?: string;
+interface SimplifiedGoogleCalendarEvent {  
   description?: string;
-  start: {
-    dateTime: string;
-    timeZone?: string;
-  };
   end: {
     dateTime: string;
     timeZone?: string;
   };
+  start: {
+    dateTime: string;
+    timeZone?: string;
+  };
+  summary?: string;  
 }
 
 async function addEvent(client: any, calendarId: any, args: any) {
@@ -111,9 +111,9 @@ async function listEvents(
         const endDateTimeLocal = moment.tz(event.end.dateTime, event.end.timeZone || 'UTC').format();
 
         return {
-          ...event,
-          start: { ...event.start, dateTime: startDateTimeLocal },
+          ...event,          
           end: { ...event.end, dateTime: endDateTimeLocal },
+          start: { ...event.start, dateTime: startDateTimeLocal },
         };
       });
 
