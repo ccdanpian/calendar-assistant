@@ -78,8 +78,6 @@ interface CalendarEvent {
   summary?: string;
 }
 
-
-// list
 async function listEvents(client: any, searchParams: any) {
   const {q, timeMax, timeMin} = searchParams;
 
@@ -108,14 +106,14 @@ async function listEvents(client: any, searchParams: any) {
     } else {
       // 转换每个事件的开始和结束时间为当地时间
       const convertedEvents = response.data.items.map((event: CalendarEvent) => {
-        const startDateTimeLocal = event.start.dateTime ? moment(event.start.dateTime).format() : event.start.date;
-        const endDateTimeLocal = event.end.dateTime ? moment(event.end.dateTime).format() : event.end.date;
-      
+        const startDateTimeLocal = event.start.dateTime ? moment(event.start.dateTime).tz(event.start.timeZone || 'UTC').format() : '';
+        const endDateTimeLocal = event.end.dateTime ? moment(event.end.dateTime).tz(event.end.timeZone || 'UTC').format() : '';
+
         // 更新事件对象的时间信息
         return {
-          ...event,
+          ...event,          
+          start: { ...event.start, dateTime: startDateTimeLocal },
           end: { ...event.end, dateTime: endDateTimeLocal },
-          start: { ...event.start, dateTime: startDateTimeLocal },          
         };
       });
 
@@ -126,7 +124,6 @@ async function listEvents(client: any, searchParams: any) {
     throw error;
   }
 }
-
 
 async function updateEvent(client: any, calendarId: any, args: any) {
   const { eventId, updateFields } = args; // updateFields 包含要更新的字段
