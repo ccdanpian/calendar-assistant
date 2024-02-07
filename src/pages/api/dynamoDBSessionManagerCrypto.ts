@@ -73,7 +73,7 @@ class DynamoDBSessionManager {
         try {
             // 查询现有会话
             const result = await this.ddbDocClient.send(new QueryCommand(queryParams));
-            console.log(`Sessions query for differing UserIds.`);
+            // console.log(`Sessions query for differing UserIds.`);
             
             // 检查result.Items是否为undefined，如果是，则使用空数组
             const items = result.Items || [];
@@ -90,7 +90,7 @@ class DynamoDBSessionManager {
             
             // 等待所有删除操作完成
             await Promise.all(deletePromises);
-            console.log(`Sessions deleted for differing UserIds.`);
+            // console.log(`Sessions deleted for differing UserIds.`);
         } catch (error) {
             console.error('Error in deleting session by email if user ID differs:', error);
         }
@@ -125,7 +125,7 @@ class DynamoDBSessionManager {
         // 尝试将会话信息存储到DynamoDB
         try {
             await this.ddbDocClient.send(new PutCommand(params));
-            console.log('Session stored successfully.');
+            // console.log('Session stored successfully.');
         } catch (error) {
             console.error('Error storing session:', error);
         }
@@ -144,11 +144,11 @@ class DynamoDBSessionManager {
             const result = await this.ddbDocClient.send(new GetCommand(params));
             if (result.Item) {
                 // 解密accessToken和refreshToken
-                console.log(`AccessToken ddd`, result.Item.AccessToken);
+                // console.log(`AccessToken ddd`, result.Item.AccessToken);
                 const accessToken = await this.decryptData(result.Item.AccessToken);
                 const refreshToken = await this.decryptData(result.Item.RefreshToken);
     
-                console.log(`AccessToken eee`, accessToken);
+                // console.log(`AccessToken eee`, accessToken);
     
                 // 将UserEmail添加到sessionData中
                 const userEmail = result.Item.UserEmail ? result.Item.UserEmail : 'Email not available';
@@ -160,7 +160,7 @@ class DynamoDBSessionManager {
                     refreshToken: refreshToken, // 解密后的刷新令牌
                     userEmail: userEmail, // 用户邮箱
                 };
-                console.log(`Session retrieved for user ${userId}`, sessionData);
+                // console.log(`Session retrieved for user ${userId}`, sessionData);
                 return sessionData;
             } else {
                 return null;
