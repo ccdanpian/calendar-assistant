@@ -131,6 +131,7 @@ async function deleteEvent(client: any, calendarId: any, eventId: string) {
   }
 }
 
+
 // Runner
 export async function runner(rawArgs: any, userId: string) {
   try {
@@ -183,7 +184,7 @@ export async function runner(rawArgs: any, userId: string) {
       case 'update': {
         return await updateEvent(client, calendar.data.id, args); // 假设 updateEvent 是定义好的函数
       }
-      'delete': {
+      case 'delete': {
         return await deleteEvent(client, calendar.data.id, args.eventId); // 假设 deleteEvent 是定义好的函数
       }
       default:
@@ -196,4 +197,3 @@ export async function runner(rawArgs: any, userId: string) {
 }
 
 export default runner;
-
