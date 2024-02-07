@@ -76,7 +76,7 @@ async function listEvents(client: any, calendarId: any, searchParams: any) {
     return oneYearLater.toISOString();
   })();
 
-  console.log(`Extracted data: action=list, startDateTime=${formattedTimeMin}, endDateTime=${formattedTimeMax}`);
+  // console.log(`Extracted data: action=list, startDateTime=${formattedTimeMin}, endDateTime=${formattedTimeMax}`);
 
   try {
     const events = await client.events.list({
@@ -184,13 +184,13 @@ export async function runner(rawArgs: any, userId: string) {
     const client = getGoogleCalendarClient(accessToken);
 
     const args = convertToRunnerArgs(rawArgs); 
-    console.log(`Executing action: ${args.action}`, args);
+    // console.log(`Executing action: ${args.action}`, args);
 
     const calendarName = 'CCALENDAR';
     
     // 确保日历存在并获取日历ID
     const calendarId = await ensureCalendarExists(client, calendarName);
-    console.log(`cal——id`, calendarId);
+    // console.log(`cal——id`, calendarId);
 
     // 根据操作类型执行相应动作
     switch (args.action) {
