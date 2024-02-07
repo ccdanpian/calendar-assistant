@@ -114,8 +114,8 @@ async function listEvents(client: any, searchParams: any) {
         // 更新事件对象的时间信息
         return {
           ...event,
-          start: { ...event.start, dateTime: startDateTimeLocal },
           end: { ...event.end, dateTime: endDateTimeLocal },
+          start: { ...event.start, dateTime: startDateTimeLocal },          
         };
       });
 
