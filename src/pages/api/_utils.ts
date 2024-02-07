@@ -132,6 +132,9 @@ async function deleteEvent(client: any, calendarId: any, eventId: string) {
 }
 
 // Runner
+// ...
+
+// Runner
 export async function runner(rawArgs: any, userId: string) {
   try {
     const session = await sessionManager.getSession(userId);
@@ -145,13 +148,13 @@ export async function runner(rawArgs: any, userId: string) {
     console.log(`Executing action: ${args.action}`, args);
 
     // 获取辅助日历ID
-    const calendarName = '日程管理_ccalendar';
+    const calendarName = '日程管理';
     const calendarId = `users/${userId}/calendars/${calendarName}`;
 
     // 检查辅助日历是否存在，如果不存在则创建一个新的辅助日历
     let calendar;
     try {
-      calendar = await client.calendars.get(calendarId);
+      calendar = await client.calendars.get({ calendarId });
     } catch (error) {
       if (error.code === 404) {
         // 日历不存在，创建一个新的辅助日历
