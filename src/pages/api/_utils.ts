@@ -1,4 +1,4 @@
-import { calendar_v3, google } from 'googleapis';
+import google from 'googleapis';
 import moment from 'moment-timezone';
 
 import { sessionManager } from './dynamoDBSessionManagerCrypto';
@@ -79,49 +79,50 @@ async function addEvent(client: any, calendarId: any, args: any) {
 }
 
 // list
-async function listEvents(
-  client: calendar_v3.Calendar, // 使用正确的类型
-  calendarId: string,
-  searchParams: { q?: string, timeMax?: { dateTime: string }, timeMin?: { dateTime: string } }
-) {
-  const { q, timeMax, timeMin } = searchParams;
+async function listEvents(client: any, searchParams: any) {
+  const {q, timeMax, timeMin} = searchParams;
 
-  let formattedTimeMin = (timeMin && timeMin.dateTime) ? timeMin.dateTime : new Date().toISOString();
-  let formattedTimeMax = (timeMax && timeMax.dateTime) ? timeMax.dateTime : (() => {
+  let formattedTimeMin = ''; // 默认时间
+  let formattedTimeMax = ''; // 默认时间
+
+  formattedTimeMin = (timeMin && timeMin.dateTime) ? timeMin.dateTime : new Date().toISOString();
+  formattedTimeMax = (timeMax && timeMax.dateTime) ? timeMax.dateTime : (() => {
     const oneYearLater = new Date();
     oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
     return oneYearLater.toISOString();
   })();
 
+  console.log(`Extracted data: action=list, startDateTime=${formattedTimeMin}, endDateTime=${formattedTimeMax}`);
+
   try {
     const response = await client.events.list({
-      calendarId,
-      q,
+      calendarId: 'primary',
+      q: q,
       timeMax: formattedTimeMax,
       timeMin: formattedTimeMin,
     });
 
-    const events = response.data.items;
-
-    if (events.length === 0) {
+    if (response.data.items.length === 0) {
       return '没有找到任何日程';
     } else {
-      const convertedEvents = events.map(event => {
-        const startDateTimeLocal = moment.tz(event.start.dateTime, event.start.timeZone || 'UTC').format();
-        const endDateTimeLocal = moment.tz(event.end.dateTime, event.end.timeZone || 'UTC').format();
+      // 转换每个事件的开始和结束时间为当地时间
+      const convertedEvents = response.data.items.map(event => {
+        const startDateTimeLocal = event.start.dateTime ? moment(event.start.dateTime).format() : event.start.date;
+        const endDateTimeLocal = event.end.dateTime ? moment(event.end.dateTime).format() : event.end.date;
 
+        // 更新事件对象的时间信息
         return {
-          ...event,          
+          ...event,
           end: { ...event.end, dateTime: endDateTimeLocal },
-          start: { ...event.start, dateTime: startDateTimeLocal },
+          start: { ...event.start, dateTime: startDateTimeLocal },          
         };
       });
 
       return convertedEvents;
     }
   } catch (error) {
-    console.error("获取日程时发生错误:", error);
-    return '获取日程时发生错误';
+    console.error('Error fetching events:', error);
+    throw error;
   }
 }
 
