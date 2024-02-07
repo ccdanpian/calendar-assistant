@@ -58,8 +58,8 @@ async function addEvent(client: any, calendarId: any, args: any) {
   };
 
   const response = await client.events.insert({
-    calendarId: calendarId,
     resource: event,
+    calendarId: calendarId,    
   });
   return response.data;
 }
