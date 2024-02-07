@@ -132,6 +132,38 @@ async function deleteEvent(client: any, calendarId: any, eventId: string) {
 }
 
 
+async function ensureCalendarExists(client: any, calendarName: string) {
+  let calendarId = null;
+
+  // 尝试查找具有指定名称的日历
+  try {
+    const calendarsList = await client.calendarList.list();
+    const existingCalendar = calendarsList.data.items.find(calendar => calendar.summary === calendarName);
+    if (existingCalendar) {
+      calendarId = existingCalendar.id; // 如果找到了，使用找到的日历ID
+    }
+  } catch (error) {
+    console.error('Error listing calendars:', error);
+    throw new Error('Failed to list calendars');
+  }
+
+  // 如果没有找到具有指定名称的日历，则创建一个新的日历
+  if (!calendarId) {
+    try {
+      const newCalendar = await client.calendars.insert({
+        resource: { summary: calendarName }
+      });
+      calendarId = newCalendar.data.id; // 使用新创建的日历ID
+    } catch (error) {
+      console.error('Error creating calendar:', error);
+      throw new Error('Failed to create calendar');
+    }
+  }
+
+  return calendarId;
+}
+
+
 // Runner
 export async function runner(rawArgs: any, userId: string) {
   try {
@@ -145,35 +177,15 @@ export async function runner(rawArgs: any, userId: string) {
     const args = convertToRunnerArgs(rawArgs); 
     console.log(`Executing action: ${args.action}`, args);
 
-    // 获取辅助日历ID
-    const calendarName = '日程管理';
-    const calendarId = `users/${userId}/calendars/${calendarName}`;
+    const calendarName = 'CCALENDAR';
+    
+    // 确保日历存在并获取日历ID
+    const calendarId = await ensureCalendarExists(client, calendarName);
 
-    // 检查辅助日历是否存在，如果不存在则创建一个新的辅助日历
-    let calendar;
-    try {
-      calendar = await client.calendars.get({ calendarId });
-    } catch (error) {
-      // 使用类型断言来告诉 TypeScript error 是一个 HttpError 类型
-      if ((error as any).response && (error as any).response.code === 404) {
-        // 日历不存在，创建一个新的辅助日历
-        const newCalendar = {
-          summary: calendarName,
-        };
-        calendar = await client.calendars.insert({
-          calendarId: `users/${userId}/calendars`,
-          resource: newCalendar,
-        });
-      } else {
-        throw error;
-      }
-    }
-
-
-
+    // 根据操作类型执行相应动作
     switch (args.action) {
       case 'add': {
-        return await addEvent(client, calendar.data.id, args);
+        return await addEvent(client, calendarId, args);
       }
       case 'list': {
         // 假设 args 中包含 timeMin, timeMax 和 q
@@ -182,13 +194,13 @@ export async function runner(rawArgs: any, userId: string) {
           timeMax: args.end,
           timeMin: args.start,          
         };
-        return await listEvents(client, calendar.data.id, searchParams);
+        return await listEvents(client, calendarId, searchParams);
       }
       case 'update': {
-        return await updateEvent(client, calendar.data.id, args); // 假设 updateEvent 是定义好的函数
+        return await updateEvent(client, calendarId, args);
       }
       case 'delete': {
-        return await deleteEvent(client, calendar.data.id, args.eventId); // 假设 deleteEvent 是定义好的函数
+        return await deleteEvent(client, calendarId, args.eventId);
       }
       default:
         throw new Error('Invalid action');
