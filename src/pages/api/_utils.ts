@@ -219,7 +219,7 @@ export async function runner(rawArgs: any, userId: string) {
     const args = convertToRunnerArgs(rawArgs); 
     // console.log(`Executing action: ${args.action}`, args);
 
-    const calendarName = 'CCALENDAR';
+    const calendarName = 'CCalendar';
     
     // 确保日历存在并获取日历ID
     const calendarId = await ensureCalendarExists(client, calendarName);
