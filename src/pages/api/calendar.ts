@@ -38,7 +38,6 @@ async function extractUserIdFromOAuth(tokens: any): Promise<string> {
   if (tokens && tokens.id_token) {
     try {
       const decodedIdToken = await decodeIdToken(tokens.id_token);
-      console.log('decodeIdToken', decodedIdToken);
       return decodedIdToken.email; // 使用解码后的 ID 令牌中的电子邮件地址
     } catch (error) {
       const message = (error as Error).message;
@@ -88,7 +87,7 @@ app.use(async (req: Request, res: Response) => {
         // 从 OAuth 提供的信息中获取用户身份
         const userEmail = await extractUserIdFromOAuth(tokens);// 这里需要实现 extractUserIdFromOAuth 函数
 
-        console.log(`xxxxx, 此id无任何信息，需要授权, calendar_user_id`, calendarUserId);
+        // console.log(`calendar_user_id`, calendarUserId);
         const userId = calendarUserId;
         const accessToken = tokens.access_token || 'no-access-token'; // 提供默认值或处理为错误
         const refreshToken = tokens.refresh_token || 'no-refresh-token'; // 提供默认值或处理为错误
@@ -110,15 +109,14 @@ app.use(async (req: Request, res: Response) => {
     } else if (req.method === 'POST') {
       // 获取用户设定的key，作为userId
       calendarUserId = await getCalendarKey(req);    
-      const userId = calendarUserId;
-      console.log(`000000, calendar_user_id`, userId);
+      const userId = calendarUserId;      
  
       let session = await sessionManager.getSession(userId);
-      console.log(`111111, session:`, await session);
+      // console.log(`session:`, await session);
 
       if (!session) {
         // 会话不存在，生成跳转认证URL
-        console.log(`222222, 会话不存在, 生成跳转认证URL`);
+        // console.log(`会话不存在, 生成跳转认证URL`);
         const authUrl = buildAuthUrl();  
         res.json({ authUrl: authUrl });
         return;
@@ -126,10 +124,10 @@ app.use(async (req: Request, res: Response) => {
 
       if (!session || !session.accessToken || new Date() > new Date(session.createdAt.getTime() + ((session.expiresIn || 0) * 1000))) {
         // ... 其他代码 ...
-        console.log(`333333, refreshToken:`, session.refreshToken);
+        // console.log(`333333, refreshToken:`, session.refreshToken);
         if (session && session.refreshToken) {
           try {
-            console.log(`555555, try refesh:`, session.refreshToken);
+            // console.log(`try refesh:`, session.refreshToken);
             // 使用 Google Auth Library 刷新令牌
             authClient.setCredentials({
               refresh_token: session.refreshToken
@@ -155,9 +153,9 @@ app.use(async (req: Request, res: Response) => {
           }
         } else {
           // 如果没有有效的刷新令牌，需要重新授权
-          console.log(`666666, 无有效令牌，需要重新授权`, session.refreshToken);
+          // console.log(`无有效令牌，需要重新授权`, session.refreshToken);
           const authUrl = buildAuthUrl();
-          console.log(`authUrl`, authUrl);
+          // console.log(`authUrl`, authUrl);
           res.json({ authUrl: authUrl });
           return;
         }        
