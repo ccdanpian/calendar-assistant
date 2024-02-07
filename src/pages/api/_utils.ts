@@ -39,7 +39,7 @@ function convertToRunnerArgs(data: any) {
   };
 }
 
-async function addEvent(client: any, args: any) {
+async function addEvent(client: any, calendarId: any, args: any) {
   let formattedTimeStart = ''; // 默认时间
   let formattedTimeEnd = ''; // 默认时间
 
@@ -57,13 +57,13 @@ async function addEvent(client: any, args: any) {
   };
 
   const response = await client.events.insert({
-    calendarId: 'primary',
+    calendarId: calendarId,
     resource: event,
   });
   return response.data;
 }
 
-async function listEvents(client: any, searchParams: any) {
+async function listEvents(client: any, calendarId: any, searchParams: any) {
   const {q, timeMax, timeMin} = searchParams;
 
   let formattedTimeMin = ''; // 默认时间
@@ -80,7 +80,7 @@ async function listEvents(client: any, searchParams: any) {
 
   try {
     const events = await client.events.list({
-      calendarId: 'primary',
+      calendarId: calendarId,
       q: q,
       timeMax: formattedTimeMax,
       timeMin: formattedTimeMin,
@@ -92,7 +92,7 @@ async function listEvents(client: any, searchParams: any) {
   }
 }
 
-async function updateEvent(client: any, args: any) {
+async function updateEvent(client: any, calendarId: any, args: any) {
   const { eventId, updateFields } = args; // updateFields 包含要更新的字段
 
   if (!eventId || !updateFields) {
@@ -113,7 +113,7 @@ async function updateEvent(client: any, args: any) {
 }
 
 
-async function deleteEvent(client: any, eventId: string) {
+async function deleteEvent(client: any, calendarId: any, eventId: string) {
   if (!eventId) {
     console.error('请提供日程标题或者ID');
     return '请提供日程标题或者ID';
@@ -121,7 +121,7 @@ async function deleteEvent(client: any, eventId: string) {
 
   try {
     await client.events.delete({
-      calendarId: 'primary',
+      calendarId: calendarId,
       eventId: eventId
     });
     return { message: '日程已成功删除' };
@@ -144,9 +144,32 @@ export async function runner(rawArgs: any, userId: string) {
     const args = convertToRunnerArgs(rawArgs); 
     console.log(`Executing action: ${args.action}`, args);
 
+    // 获取辅助日历ID
+    const calendarName = '日程管理_ccalendar';
+    const calendarId = `users/${userId}/calendars/${calendarName}`;
+
+    // 检查辅助日历是否存在，如果不存在则创建一个新的辅助日历
+    let calendar;
+    try {
+      calendar = await client.calendars.get(calendarId);
+    } catch (error) {
+      if (error.code === 404) {
+        // 日历不存在，创建一个新的辅助日历
+        const newCalendar = {
+          summary: calendarName,
+        };
+        calendar = await client.calendars.insert({
+          calendarId: `users/${userId}/calendars`,
+          resource: newCalendar,
+        });
+      } else {
+        throw error;
+      }
+    }
+
     switch (args.action) {
       case 'add': {
-        return await addEvent(client, args);
+        return await addEvent(client, calendar.data.id, args);
       }
       case 'list': {
         // 假设 args 中包含 timeMin, timeMax 和 q
@@ -155,13 +178,13 @@ export async function runner(rawArgs: any, userId: string) {
           timeMax: args.end,
           timeMin: args.start,          
         };
-        return await listEvents(client, searchParams);
+        return await listEvents(client, calendar.data.id, searchParams);
       }
       case 'update': {
-        return await updateEvent(client, args); // 假设 updateEvent 是定义好的函数
+        return await updateEvent(client, calendar.data.id, args); // 假设 updateEvent 是定义好的函数
       }
       case 'delete': {
-        return await deleteEvent(client, args.eventId); // 假设 deleteEvent 是定义好的函数
+        return await deleteEvent(client, calendar.data.id, args.eventId); // 假设 deleteEvent 是定义好的函数
       }
       default:
         throw new Error('Invalid action');
