@@ -78,7 +78,7 @@ interface CalendarEvent {
   summary?: string;
 }
 
-async function listEvents(client: any, searchParams: any) {
+async function listEvents(client: any, calendarId: any, searchParams: any) {
   const {q, timeMax, timeMin} = searchParams;
 
   let formattedTimeMin = ''; // 默认时间
@@ -95,7 +95,7 @@ async function listEvents(client: any, searchParams: any) {
 
   try {
     const response = await client.events.list({
-      calendarId: 'primary',
+      calendarId: calendarId,
       q: q,
       timeMax: formattedTimeMax,
       timeMin: formattedTimeMin,
