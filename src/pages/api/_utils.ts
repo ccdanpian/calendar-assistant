@@ -64,6 +64,21 @@ async function addEvent(client: any, calendarId: any, args: any) {
   return response.data;
 }
 
+// for list
+interface CalendarEvent {  
+  description?: string;
+  end: {
+    dateTime: string;
+    timeZone?: string;
+  };
+  start: {
+    dateTime: string;
+    timeZone?: string;
+  };
+  summary?: string;
+}
+
+
 // list
 async function listEvents(client: any, searchParams: any) {
   const {q, timeMax, timeMin} = searchParams;
@@ -92,15 +107,15 @@ async function listEvents(client: any, searchParams: any) {
       return '没有找到任何日程';
     } else {
       // 转换每个事件的开始和结束时间为当地时间
-      const convertedEvents = response.data.items.map(event => {
+      const convertedEvents = response.data.items.map((event: CalendarEvent) => {
         const startDateTimeLocal = event.start.dateTime ? moment(event.start.dateTime).format() : event.start.date;
         const endDateTimeLocal = event.end.dateTime ? moment(event.end.dateTime).format() : event.end.date;
-
+      
         // 更新事件对象的时间信息
         return {
           ...event,
+          start: { ...event.start, dateTime: startDateTimeLocal },
           end: { ...event.end, dateTime: endDateTimeLocal },
-          start: { ...event.start, dateTime: startDateTimeLocal },          
         };
       });
 
