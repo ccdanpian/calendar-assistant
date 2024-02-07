@@ -163,7 +163,11 @@ async function ensureCalendarExists(client: any, calendarName: string): Promise<
       throw new Error('Failed to create calendar');
     }
   }
-
+  // 在函数最后返回前检查calendarId是否为null
+  if (calendarId === null) {
+    throw new Error('Failed to obtain a calendar ID');
+  }
+  
   return calendarId;
 }
 
