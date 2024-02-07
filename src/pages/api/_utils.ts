@@ -40,6 +40,20 @@ function convertToRunnerArgs(data: any) {
   };
 }
 
+// for list
+interface SimplifiedGoogleCalendarEvent {
+  summary?: string;
+  description?: string;
+  start: {
+    dateTime: string;
+    timeZone?: string;
+  };
+  end: {
+    dateTime: string;
+    timeZone?: string;
+  };
+}
+
 async function addEvent(client: any, calendarId: any, args: any) {
   let formattedTimeStart = ''; // 默认时间
   let formattedTimeEnd = ''; // 默认时间
@@ -64,53 +78,53 @@ async function addEvent(client: any, calendarId: any, args: any) {
   return response.data;
 }
 
-async function listEvents(client: any, calendarId: any, searchParams: any) {
-  const {q, timeMax, timeMin} = searchParams;
+// list
+async function listEvents(
+  client: { events: { list: (params: { calendarId: string, q?: string, timeMax: string, timeMin: string }) => Promise<{ data: { items: SimplifiedGoogleCalendarEvent[] } }> } },
+  calendarId: string,
+  searchParams: { q?: string, timeMax?: { dateTime: string }, timeMin?: { dateTime: string } }
+) {
+  const { q, timeMax, timeMin } = searchParams;
 
-  let formattedTimeMin = ''; // 默认时间
-  let formattedTimeMax = ''; // 默认时间
-
-  formattedTimeMin = (timeMin && timeMin.dateTime) ? timeMin.dateTime : new Date().toISOString();
-  formattedTimeMax = (timeMax && timeMax.dateTime) ? timeMax.dateTime : (() => {
+  let formattedTimeMin = (timeMin && timeMin.dateTime) ? timeMin.dateTime : new Date().toISOString();
+  let formattedTimeMax = (timeMax && timeMax.dateTime) ? timeMax.dateTime : (() => {
     const oneYearLater = new Date();
     oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
     return oneYearLater.toISOString();
   })();
 
-  // console.log(`Extracted data: action=list, startDateTime=${formattedTimeMin}, endDateTime=${formattedTimeMax}`);
-
   try {
-      const events = await client.events.list({
-        calendarId: calendarId,
-        q: q,
-        timeMax: formattedTimeMax,
-        timeMin: formattedTimeMin,
+    const response = await client.events.list({
+      calendarId,
+      q,
+      timeMax: formattedTimeMax,
+      timeMin: formattedTimeMin,
+    });
+
+    const events = response.data.items;
+
+    if (events.length === 0) {
+      return '没有找到任何日程';
+    } else {
+      const convertedEvents = events.map(event => {
+        const startDateTimeLocal = moment.tz(event.start.dateTime, event.start.timeZone || 'UTC').format();
+        const endDateTimeLocal = moment.tz(event.end.dateTime, event.end.timeZone || 'UTC').format();
+
+        return {
+          ...event,
+          start: { ...event.start, dateTime: startDateTimeLocal },
+          end: { ...event.end, dateTime: endDateTimeLocal },
+        };
       });
-      
-      if (events.length === 0) {
-          return '没有找到任何日程';
-        } else {
-          const convertedEvents = events.map((event: any) => {
-            const startDateTimeLocal = moment.tz(event.start.dateTime, event.start.timeZone || 'UTC').format();
-            const endDateTimeLocal = moment.tz(event.end.dateTime, event.end.timeZone || 'UTC').format();
-        
-            // 使用类型断言来告诉TypeScript编译器关于event对象的期望结构
-            const convertedEvent = {
-              ...event, 
-              end: { ...event.end, dateTime: endDateTimeLocal },
-              start: { ...event.start, dateTime: startDateTimeLocal },              
-            }; // 假设GoogleCalendarEvent是您的目标结构
-        
-            return convertedEvent;
-          });
-        
-          return convertedEvents;
-        }
+
+      return convertedEvents;
+    }
   } catch (error) {
-      console.error("获取日程时发生错误:", error);
-      return '获取日程时发生错误';
+    console.error("获取日程时发生错误:", error);
+    return '获取日程时发生错误';
   }
 }
+
 
 async function updateEvent(client: any, calendarId: any, args: any) {
   const { eventId, updateFields } = args; // updateFields 包含要更新的字段
