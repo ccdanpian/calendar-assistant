@@ -57,9 +57,9 @@ async function addEvent(client: any, calendarId: any, args: any) {
     summary: args.subject,    
   };
 
-  const response = await client.events.insert({
+  const response = await client.events.insert({    
+    calendarId: calendarId,
     resource: event,
-    calendarId: calendarId,    
   });
   return response.data;
 }
@@ -111,9 +111,9 @@ async function listEvents(client: any, calendarId: any, searchParams: any) {
 
         // 更新事件对象的时间信息
         return {
-          ...event,          
-          start: { ...event.start, dateTime: startDateTimeLocal },
+          ...event,
           end: { ...event.end, dateTime: endDateTimeLocal },
+          start: { ...event.start, dateTime: startDateTimeLocal },          
         };
       });
 
