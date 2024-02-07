@@ -190,6 +190,7 @@ export async function runner(rawArgs: any, userId: string) {
     
     // 确保日历存在并获取日历ID
     const calendarId = await ensureCalendarExists(client, calendarName);
+    console.log(`cal——id`, calendarId);
 
     // 根据操作类型执行相应动作
     switch (args.action) {
