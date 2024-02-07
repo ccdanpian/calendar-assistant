@@ -1,4 +1,5 @@
 import { google } from 'googleapis';
+import moment from 'moment-timezone';
 
 import { sessionManager } from './dynamoDBSessionManagerCrypto';
 
@@ -79,16 +80,37 @@ async function listEvents(client: any, calendarId: any, searchParams: any) {
   // console.log(`Extracted data: action=list, startDateTime=${formattedTimeMin}, endDateTime=${formattedTimeMax}`);
 
   try {
-    const events = await client.events.list({
-      calendarId: calendarId,
-      q: q,
-      timeMax: formattedTimeMax,
-      timeMin: formattedTimeMin,
-    });
-    return events.data.items.length === 0 ? '没有找到任何日程' : events.data.items;
+      const events = await client.events.list({
+        calendarId: calendarId,
+        q: q,
+        timeMax: formattedTimeMax,
+        timeMin: formattedTimeMin,
+      });
+      
+      if (events.data.items.length === 0) {
+          return '没有找到任何日程';
+      } else {
+          // 转换每个事件的开始和结束时间为当地时间
+          const convertedEvents = events.data.items.map(event => {
+              // 检查并使用事件的时区信息，如果没有提供时区，默认使用'UTC'
+              const timeZone = event.start.timeZone || 'UTC';
+  
+              // 使用moment-timezone转换开始时间和结束时间
+              const startDateTimeLocal = moment.tz(event.start.dateTime, timeZone).format();
+              const endDateTimeLocal = moment.tz(event.end.dateTime, timeZone).format();
+              
+              // 更新事件对象的时间信息
+              event.start.dateTime = startDateTimeLocal;
+              event.end.dateTime = endDateTimeLocal;
+              
+              return event;
+          });
+  
+          return convertedEvents;
+      }
   } catch (error) {
-    console.error('Error fetching events:', error);
-    throw error;
+      console.error("获取日程时发生错误:", error);
+      return '获取日程时发生错误';
   }
 }
 
