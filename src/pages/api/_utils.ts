@@ -132,13 +132,17 @@ async function deleteEvent(client: any, calendarId: any, eventId: string) {
 }
 
 
-async function ensureCalendarExists(client: any, calendarName: string) {
-  let calendarId = null;
+interface Calendar {
+  id: string;
+  summary: string;
+}
 
-  // 尝试查找具有指定名称的日历
+async function ensureCalendarExists(client: any, calendarName: string): Promise<string> {
+  let calendarId: string | null = null;
+
   try {
     const calendarsList = await client.calendarList.list();
-    const existingCalendar = calendarsList.data.items.find(calendar => calendar.summary === calendarName);
+    const existingCalendar = calendarsList.data.items.find((calendar: Calendar) => calendar.summary === calendarName);
     if (existingCalendar) {
       calendarId = existingCalendar.id; // 如果找到了，使用找到的日历ID
     }
@@ -151,7 +155,7 @@ async function ensureCalendarExists(client: any, calendarName: string) {
   if (!calendarId) {
     try {
       const newCalendar = await client.calendars.insert({
-        resource: { summary: calendarName }
+        resource: { summary: calendarName },
       });
       calendarId = newCalendar.data.id; // 使用新创建的日历ID
     } catch (error) {
@@ -162,6 +166,7 @@ async function ensureCalendarExists(client: any, calendarName: string) {
 
   return calendarId;
 }
+
 
 
 // Runner
