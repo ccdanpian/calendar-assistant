@@ -1,4 +1,4 @@
-import google from 'googleapis';
+import { google } from 'googleapis';
 import moment from 'moment-timezone';
 
 import { sessionManager } from './dynamoDBSessionManagerCrypto';
