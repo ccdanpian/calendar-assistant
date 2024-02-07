@@ -1,4 +1,4 @@
-import { google } from 'googleapis';
+import { calendar_v3, google } from 'googleapis';
 import moment from 'moment-timezone';
 
 import { sessionManager } from './dynamoDBSessionManagerCrypto';
@@ -80,7 +80,7 @@ async function addEvent(client: any, calendarId: any, args: any) {
 
 // list
 async function listEvents(
-  client: { events: { list: (params: { calendarId: string, q?: string, timeMax: string, timeMin: string }) => Promise<{ data: { items: SimplifiedGoogleCalendarEvent[] } }> } },
+  client: calendar_v3.Calendar, // 使用正确的类型
   calendarId: string,
   searchParams: { q?: string, timeMax?: { dateTime: string }, timeMin?: { dateTime: string } }
 ) {
