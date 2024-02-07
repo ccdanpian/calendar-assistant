@@ -40,20 +40,6 @@ function convertToRunnerArgs(data: any) {
   };
 }
 
-// for list
-interface SimplifiedGoogleCalendarEvent {  
-  description?: string;
-  end: {
-    dateTime: string;
-    timeZone?: string;
-  };
-  start: {
-    dateTime: string;
-    timeZone?: string;
-  };
-  summary?: string;  
-}
-
 async function addEvent(client: any, calendarId: any, args: any) {
   let formattedTimeStart = ''; // 默认时间
   let formattedTimeEnd = ''; // 默认时间
