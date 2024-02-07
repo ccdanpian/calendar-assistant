@@ -154,25 +154,21 @@ export async function runner(rawArgs: any, userId: string) {
     try {
       calendar = await client.calendars.get({ calendarId });
     } catch (error) {
-      // 先检查 error 是否具有 response 属性
-      if (error && typeof error === 'object' && 'response' in error && error.response) {
-        // 再检查 response 是否具有 code 属性
-        if (error.response.code === 404) {
-          // 日历不存在，创建一个新的辅助日历
-          const newCalendar = {
-            summary: calendarName,
-          };
-          calendar = await client.calendars.insert({
-            calendarId: `users/${userId}/calendars`,
-            resource: newCalendar,
-          });
-        } else {
-          throw error;
-        }
+      // 使用类型断言来告诉 TypeScript error 是一个 HttpError 类型
+      if ((error as any).response && (error as any).response.code === 404) {
+        // 日历不存在，创建一个新的辅助日历
+        const newCalendar = {
+          summary: calendarName,
+        };
+        calendar = await client.calendars.insert({
+          calendarId: `users/${userId}/calendars`,
+          resource: newCalendar,
+        });
       } else {
         throw error;
       }
     }
+
 
 
     switch (args.action) {
