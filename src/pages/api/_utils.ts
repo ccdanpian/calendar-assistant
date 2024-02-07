@@ -101,7 +101,7 @@ async function updateEvent(client: any, calendarId: any, args: any) {
 
   try {
     const updatedEvent = await client.events.update({
-      calendarId: 'primary',
+      calendarId: calendarId,
       eventId: eventId,
       resource: updateFields
     });
@@ -132,9 +132,6 @@ async function deleteEvent(client: any, calendarId: any, eventId: string) {
 }
 
 // Runner
-// ...
-
-// Runner
 export async function runner(rawArgs: any, userId: string) {
   try {
     const session = await sessionManager.getSession(userId);
@@ -156,7 +153,7 @@ export async function runner(rawArgs: any, userId: string) {
     try {
       calendar = await client.calendars.get({ calendarId });
     } catch (error) {
-      if (error.code === 404) {
+      if (error.response && error.response.code === 404) {
         // 日历不存在，创建一个新的辅助日历
         const newCalendar = {
           summary: calendarName,
@@ -186,7 +183,7 @@ export async function runner(rawArgs: any, userId: string) {
       case 'update': {
         return await updateEvent(client, calendar.data.id, args); // 假设 updateEvent 是定义好的函数
       }
-      case 'delete': {
+      'delete': {
         return await deleteEvent(client, calendar.data.id, args.eventId); // 假设 deleteEvent 是定义好的函数
       }
       default:
@@ -199,3 +196,4 @@ export async function runner(rawArgs: any, userId: string) {
 }
 
 export default runner;
+
