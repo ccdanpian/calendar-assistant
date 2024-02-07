@@ -21,7 +21,7 @@ function convertToRunnerArgs(data: any) {
   const endDateTime = data['endDateTime'];
   const eventId = data.eventId;
 
-  console.log(`Extracted data: action=${action}, subject=${subject}, description=${description}, startDateTime=${startDateTime}, endDateTime=${endDateTime}, eventId=${eventId}`);
+  // console.log(`Extracted data: action=${action}, subject=${subject}, description=${description}, startDateTime=${startDateTime}, endDateTime=${endDateTime}, eventId=${eventId}`);
 
   return {
     action: action,    
