@@ -97,9 +97,9 @@ async function listEvents(client: any, calendarId: any, searchParams: any) {
             // 使用类型断言来告诉TypeScript编译器关于event对象的期望结构
             const convertedEvent = {
               ...event, 
-              start: { ...event.start, dateTime: startDateTimeLocal },
               end: { ...event.end, dateTime: endDateTimeLocal },
-            } as GoogleCalendarEvent; // 假设GoogleCalendarEvent是您的目标结构
+              start: { ...event.start, dateTime: startDateTimeLocal },              
+            }; // 假设GoogleCalendarEvent是您的目标结构
         
             return convertedEvent;
           });
