@@ -171,7 +171,7 @@ interface Calendar {
 }
 
 async function ensureCalendarExists(client: any, calendarName: string): Promise<string> {
-  let calendarId: string | undefined;
+  let calendarId: string | null = null;
 
   try {
     const calendarsList = await client.calendarList.list();
