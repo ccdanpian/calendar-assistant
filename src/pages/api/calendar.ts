@@ -150,7 +150,7 @@ app.use(async (req: Request, res: Response) => {
           } catch (error: unknown) {
             // 使用类型断言来处理
             const axiosError = error as { response: { data: { error: string } } | undefined };
-            console.error('############', axiosError.response.data.error);
+            console.error('############', error);
           
             if (axiosError.response && axiosError.response.data.error === 'Invalid Credentials') {
               // 对'invalid_grant'错误特殊处理
