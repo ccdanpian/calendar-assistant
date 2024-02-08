@@ -252,11 +252,13 @@ export async function runner(rawArgs: any, userId: string) {
     // 使用三元表达式简化的错误消息分配
     const errorMessage: string = error instanceof Error ? error.message : String(error);
     console.error('Error in runner:', errorMessage); // 记录错误信息
-  
+    
+    throw error;
+    
     // 使用三元表达式简化的授权错误检查和抛出异常
-    throw errorMessage.includes('Unauthorized') || errorMessage.includes('Invalid credentials')
-      ? new Error('Unauthorized: Invalid credentials. Please re-authenticate.')
-      : new Error(errorMessage);
+    // throw errorMessage.includes('Unauthorized') || errorMessage.includes('Invalid credentials')
+    //   ? new Error('Unauthorized: Invalid credentials. Please re-authenticate.')
+    //   : new Error(errorMessage);
   }
 } 
 export default runner;
