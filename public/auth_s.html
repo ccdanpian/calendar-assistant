@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Authentication Successful</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        font-family: Arial, sans-serif;
+      }
+      .button {
+        margin-top: 20px;
+        padding: 10px 15px;
+        font-size: 16px;
+      }
+      .revoke {
+        position: absolute;
+        bottom: 20px;
+        text-align: center;
+        width: 100%;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Authentication Successful</h2>
+
+    <p>You've successfully authenticated with Google.</p>
+
+    <button class="button" onclick="closeWindow()">Close this page</button>
+
+    <div class="revoke">
+      <p>If you wish to revoke the authorization, you can do so at Google's 
+        <a href="https://myaccount.google.com/permissions">Account Permissions</a> page.
+      </p>
+    </div>
+    
+    <script>
+      function closeWindow() {
+        if (window.openedWithScript) {
+          window.close();
+        } else {
+          alert('Please close this window manually.');
+        }
+      }
+    </script>
+
+  </body>
+</html>
