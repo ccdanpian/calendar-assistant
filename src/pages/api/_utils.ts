@@ -180,7 +180,7 @@ async function ensureCalendarExists(client: any, calendarName: string): Promise<
       calendarId = existingCalendar.id; // 如果找到了，使用找到的日历ID
     }
   } catch (error) {
-    // console.error('Error listing calendars:', error);
+    console.error('Error listing calendars:', error);
     throw error; // 直接向上抛出原始错误
   }
 
@@ -251,7 +251,7 @@ export async function runner(rawArgs: any, userId: string) {
   } catch (error: unknown) {
     // 使用三元表达式简化的错误消息分配
     const errorMessage: string = error instanceof Error ? error.message : String(error);
-    // console.error('Error in runner:', errorMessage); // 记录错误信息
+    console.error('Error in runner:', errorMessage); // 记录错误信息
     
     throw error;
     
