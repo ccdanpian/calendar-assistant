@@ -147,20 +147,28 @@ app.use(async (req: Request, res: Response) => {
             await sessionManager.storeSession(userId, accessToken, new Date(), expiresIn_s, refreshToken, userEmail);
         
             // 继续处理原始请求
-          } catch (error) {
-              // 通过判断error对象来处理不同类型的错误
-              if (error.response && error.response.data && error.response.data.error === 'invalid_grant') {
-                // 对于 'invalid_grant' 错误，提示用户重新授权
-                console.error('Error refreshing token due to invalid grant:', error);
-                const authUrl = buildAuthUrl();  // 假设这个函数会返回重认证的URL
-                res.status(401).json({ error: 'Token has been expired or revoked. Please re-authenticate using the following URL.', authUrl: authUrl });
-              } else {
-                // 对于其他类型的错误，返回一般的错误信息
-                console.error('Error refreshing token:', error);
-                res.status(401).json({ error: 'Failed to refresh token' });
-              }
-              return;
+          } catch (error: unknown) {
+          // 检查error是否为Error对象，以便访问其属性
+          if (error instanceof Error && error.response && error.response.data) {
+            // 进一步检查Google API特定的错误属性
+            const responseError = error.response.data.error;
+            if (typeof responseError === 'string' && responseError === 'invalid_grant') {
+              // 对于 'invalid_grant' 错误，提示用户重新授权
+              console.error('Error refreshing token due to invalid grant:', error);
+              const authUrl = buildAuthUrl();  // 假设这个函数会返回重认证的URL
+              res.status(401).json({ error: 'Token has been expired or revoked. Please re-authenticate using the following URL.', authUrl: authUrl });
+            } else {
+              // 对于其他类型的错误，返回一般的错误信息
+              console.error('Error refreshing token:', error.message);
+              res.status(401).json({ error: 'Failed to refresh token' });
             }
+          } else {
+            // error不是Error对象或者error对象不包含预期的属性，处理未知类型的错误
+            console.error('An unknown error occurred while refreshing token');
+            res.status(401).json({ error: 'An unknown error occurred while refreshing token' });
+          }
+          return;
+        }
         } else {
           // 如果没有有效的刷新令牌，需要重新授权
           console.error('No valid refresh token. Requiring re-authentication');
