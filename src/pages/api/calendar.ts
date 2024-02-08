@@ -173,14 +173,21 @@ app.use(async (req: Request, res: Response) => {
     }
   } catch (error) {
     if (error instanceof Error) {
-      console.error('Error:', error);
-      res.status(500).json({ error: error.message, stack: error.stack });
+      if (error.message.includes('Unauthorized') || error.message.includes('Invalid credentials')) {
+        // 当捕获到授权错误时，说明用户需要重新授权
+        console.error('Authorization error:', error);
+        const authUrl = buildAuthUrl();
+        res.status(401).json({ error: 'Authorization required. Please re-authenticate.', authUrl: authUrl });
+      } else {
+        console.error('Error:', error);
+        res.status(500).json({ error: error.message, stack: error.stack });
+      }
     } else {
       // 处理其他类型的错误或未知错误
       console.error('Unknown error', error);
       res.status(500).json({ error: "An unknown error occurred" });
     }
-  }  
+  }
 });
 
 module.exports = app;
