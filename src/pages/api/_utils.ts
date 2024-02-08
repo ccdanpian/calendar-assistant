@@ -249,9 +249,15 @@ export async function runner(rawArgs: any, userId: string) {
         throw new Error('Invalid action');
     }
   } catch (error) {
+    // 检测授权错误
+    if (error.response && error.response.status === 401) {
+      // 如果确认是授权错误，直接抛出一个特定的错误消息
+      throw new Error('Unauthorized: Invalid credentials. Please re-authenticate.');
+    }
+    
+    // 处理其他类型的错误
     console.error('Error in runner:', error);
     throw error;
   }
 }
-
 export default runner;
