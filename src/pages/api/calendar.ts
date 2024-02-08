@@ -152,7 +152,7 @@ app.use(async (req: Request, res: Response) => {
             const axiosError = error as { response: { data: { error: string } } | undefined };
             console.error('############', error);
           
-            if (axiosError.response && axiosError.response.data.error === 'Invalid Credentials' | axiosError.response.data.error === 'invalid_grant') {
+            if (axiosError.response && axiosError.response.data.error === 'Invalid Credentials' || axiosError.response.data.error === 'invalid_grant') {
               // 对'invalid_grant'错误特殊处理
               console.log('*****************');
               console.error('Token has been expired or revoked. Please re-authenticate using the following URL:', error);
