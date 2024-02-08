@@ -1,5 +1,7 @@
 // import fetch from 'node-fetch';
 import { OAuth2Client } from 'google-auth-library';
+import axios, { AxiosError } from 'axios';
+
 // import { sessionManager } from './sessionManager';
 import { sessionManager } from './dynamoDBSessionManagerCrypto';
 import { runner } from './_utils'; // 假设这是处理日历操作的函数
@@ -150,29 +152,29 @@ app.use(async (req: Request, res: Response) => {
           } catch (error: unknown) {
             // 使用类型断言来处理
             const axiosError = error as { response: { data: { error: string } } | undefined };
-            console.error('############', error);
+            console.error('000000000000############', error);
           
             if (axiosError.response && (axiosError.response.data.error === 'Invalid Credentials' || axiosError.response.data.error === 'invalid_grant')) {
               // 对'invalid_grant'错误特殊处理
-              console.log('*****************');
-              console.error('Token has been expired or revoked. Please re-authenticate using the following URL:', error);
+              console.log('000000000*****************');
+              console.error('000000Token has been expired or revoked. Please re-authenticate using the following URL:', error);
               const authUrl = buildAuthUrl();
               res.json({ authUrl: authUrl });
             } else if (axiosError.response) {
               // 处理其他类型的HTTP响应错误
-              console.log('88888888888888888888');
+              console.log('0000000000000088888888888888888888');
               console.error('Error refreshing token:', axiosError.response.data);
               res.status(401).json({ error: 'Failed to refresh token' });
               const authUrl = buildAuthUrl();
               res.json({ authUrl: authUrl });
             } else if (error instanceof Error) {
               // 处理标准错误对象
-              console.log('%%%%%%%%%%%%%%%%%%%%%');
+              console.log('0000000000000000000%%%%%%%%%%%%%%%%%%%%%');
               console.error('Error refreshing token:', error.message);
               res.status(401).json({ error: error.message });
             } else {
               // 处理未知类型错误
-              console.error('An unknown error occurred while refreshing token:', error);
+              console.error('0000000000000000An unknown error occurred while refreshing token:', error);
               res.status(401).json({ error: 'An unknown error occurred while refreshing token' });
             }
             return;
@@ -195,35 +197,39 @@ app.use(async (req: Request, res: Response) => {
       res.status(405).json({ error: 'Method not allowed' });
     }
   } catch (error: unknown) {
-            // 使用类型断言来处理
-            const axiosError = error as { response: { data: { error: string } } | undefined };
-            console.error('############', error);
-          
-            if (axiosError.response && (axiosError.response.data.error === 'Invalid Credentials' || axiosError.response.data.error === 'invalid_grant')) {
-              // 对'invalid_grant'错误特殊处理
-              console.log('*****************');
-              console.error('Token has been expired or revoked. Please re-authenticate using the following URL:', error);
-              const authUrl = buildAuthUrl();
-              res.json({ authUrl: authUrl });
-            } else if (axiosError.response) {
-              // 处理其他类型的HTTP响应错误
-              console.log('00000000000008');
-              console.error('Error refreshing token:', axiosError.response.data);
-              res.status(401).json({ error: 'Failed to refresh token' });
-              const authUrl = buildAuthUrl();
-              res.json({ authUrl: authUrl });
-            } else if (error instanceof Error) {
-              // 处理标准错误对象
-              console.log('%%%%%%%%%%%%%%%%%%%%%');
-              console.error('Error refreshing token:', error.message);
-              res.status(401).json({ error: error.message });
-            } else {
-              // 处理未知类型错误
-              console.error('An unknown error occurred while refreshing token:', error);
-              res.status(401).json({ error: 'An unknown error occurred while refreshing token' });
-            }
-            return;
+    console.error('An error occurred:', error);
+    const e = error as any;  // 使用 'any'类型，这样就不需要特定的类型提示了。
+  
+    if (e && e.response && e.response.data && e.response.data.error) {
+      // 提取错误信息并处理它
+      const errors = e.response.data.error.errors;
+      
+      if (errors && Array.isArray(errors)) {
+        errors.forEach((errorDetail) => {
+          if (errorDetail.reason === 'authError' && errorDetail.message === 'Invalid Credentials') {
+            // 这里处理 'Invalid Credentials' 错误
+            console.error('Invalid Credentials: Please check the OAuth credentials and ensure they are correct.');
+            
+            // 在这里添加用于刷新token或重新授权的逻辑
+            const authUrl = buildAuthUrl(); // 重新获取授权的URL
+            // Create an object with authUrl and a message
+            const responseObject = {
+              authUrl: authUrl,
+              message: "你需要重新授权。请点击以下链接完成授权过程。" // 你想要提供的提示信息
+            };
+
+            // Send the response object as JSON
+            res.json(responseObject);
           }
+        });
+      }
+    } else {
+      // 处理未知或不是来自Gaxios的错误
+      console.error('An unknown error occurred that is not related to Gaxios:', error);
+    }
+    // 添加你的错误响应逻辑，例如设定HTTP状态码
+    return;
+  }
 });
 
 module.exports = app;
