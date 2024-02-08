@@ -1,6 +1,5 @@
 // import fetch from 'node-fetch';
 import { OAuth2Client } from 'google-auth-library';
-import axios, { AxiosError } from 'axios';
 
 // import { sessionManager } from './sessionManager';
 import { sessionManager } from './dynamoDBSessionManagerCrypto';
