@@ -150,15 +150,12 @@ app.use(async (req: Request, res: Response) => {
           } catch (error: unknown) {
             // 使用类型断言来处理
             const axiosError = error as { response: { data: { error: string } } | undefined };
+            console.error('############', axiosError.response.data.error);
           
-            if (axiosError.response && axiosError.response.data.error === 'invalid_grant') {
+            if (axiosError.response && axiosError.response.data.error === 'Invalid Credentials') {
               // 对'invalid_grant'错误特殊处理
               console.error('Token has been expired or revoked. Please re-authenticate using the following URL:', error);
               const authUrl = buildAuthUrl();
-              // res.status(401).json({
-              //   authUrl: authUrl,
-              //   error: 'Token has been expired or revoked. Please re-authenticate using the following URL.',                
-              // });
               res.json({ authUrl: authUrl });
             } else if (axiosError.response) {
               // 处理其他类型的HTTP响应错误
@@ -179,7 +176,6 @@ app.use(async (req: Request, res: Response) => {
           // 如果没有有效的刷新令牌，需要重新授权
           console.error('No valid refresh token. Requiring re-authentication');
           const authUrl = buildAuthUrl();  // 重新获取授权的URL
-          // res.json({ authUrl: authUrl, error: 'No valid refresh token. Please re-authenticate using the following URL.' });
           res.json({ authUrl: authUrl });
           return;
         }
