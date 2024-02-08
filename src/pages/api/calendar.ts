@@ -152,17 +152,20 @@ app.use(async (req: Request, res: Response) => {
             const axiosError = error as { response: { data: { error: string } } | undefined };
             console.error('############', error);
           
-            if (axiosError.response && axiosError.response.data.error === 'Invalid Credentials') {
+            if (axiosError.response && axiosError.response.data.error === 'Invalid Credentials' | axiosError.response.data.error === 'invalid_grant') {
               // 对'invalid_grant'错误特殊处理
+              console.log('*****************');
               console.error('Token has been expired or revoked. Please re-authenticate using the following URL:', error);
               const authUrl = buildAuthUrl();
               res.json({ authUrl: authUrl });
             } else if (axiosError.response) {
               // 处理其他类型的HTTP响应错误
+              console.log('88888888888888888888');
               console.error('Error refreshing token:', axiosError.response.data);
               res.status(401).json({ error: 'Failed to refresh token' });
             } else if (error instanceof Error) {
               // 处理标准错误对象
+              console.log('%%%%%%%%%%%%%%%%%%%%%');
               console.error('Error refreshing token:', error.message);
               res.status(401).json({ error: error.message });
             } else {
