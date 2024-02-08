@@ -181,7 +181,7 @@ async function ensureCalendarExists(client: any, calendarName: string): Promise<
     }
   } catch (error) {
     console.error('Error listing calendars:', error);
-    throw new Error('Failed to list calendars');
+    throw error; // 直接向上抛出原始错误
   }
 
   // 如果没有找到具有指定名称的日历，则创建一个新的日历
