@@ -172,19 +172,22 @@ app.use(async (req: Request, res: Response) => {
       res.status(405).json({ error: 'Method not allowed' });
     }
   } catch (error) {
+    // 使用类型守卫来确定error是一个Error对象
     if (error instanceof Error) {
+      // 现在TypeScript知道error是一个Error对象，我们可以安全访问message和stack属性
       if (error.message.includes('Unauthorized') || error.message.includes('Invalid credentials')) {
-        // 当捕获到授权错误时，说明用户需要重新授权
+        // 处理授权错误
         console.error('Authorization error:', error);
         const authUrl = buildAuthUrl();
-        res.status(401).json({ error: 'Authorization required. Please re-authenticate.', authUrl: authUrl });
+        res.status(401).json({ authUrl: authUrl, error: 'Authorization required. Please re-authenticate.' });
       } else {
+        // 处理其他错误
         console.error('Error:', error);
         res.status(500).json({ error: error.message, stack: error.stack });
       }
     } else {
-      // 处理其他类型的错误或未知错误
-      console.error('Unknown error', error);
+      // 未知类型的错误，它可能不是一个Error对象
+      console.error('Unknown error:', error);
       res.status(500).json({ error: "An unknown error occurred" });
     }
   }
