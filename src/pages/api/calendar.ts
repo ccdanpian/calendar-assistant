@@ -148,19 +148,26 @@ app.use(async (req: Request, res: Response) => {
         
             // 继续处理原始请求
           } catch (error) {
-            // 如果刷新令牌失败，处理错误
-            console.error('Error refreshing token:', error);
-            res.status(401).json({ error: 'Failed to refresh token' });
-            return;
-          }
+              // 通过判断error对象来处理不同类型的错误
+              if (error.response && error.response.data && error.response.data.error === 'invalid_grant') {
+                // 对于 'invalid_grant' 错误，提示用户重新授权
+                console.error('Error refreshing token due to invalid grant:', error);
+                const authUrl = buildAuthUrl();  // 假设这个函数会返回重认证的URL
+                res.status(401).json({ error: 'Token has been expired or revoked. Please re-authenticate using the following URL.', authUrl: authUrl });
+              } else {
+                // 对于其他类型的错误，返回一般的错误信息
+                console.error('Error refreshing token:', error);
+                res.status(401).json({ error: 'Failed to refresh token' });
+              }
+              return;
+            }
         } else {
           // 如果没有有效的刷新令牌，需要重新授权
-          // console.log(`无有效令牌，需要重新授权`, session.refreshToken);
-          const authUrl = buildAuthUrl();
-          // console.log(`authUrl`, authUrl);
-          res.json({ authUrl: authUrl });
+          console.error('No valid refresh token. Requiring re-authentication');
+          const authUrl = buildAuthUrl();  // 重新获取授权的URL
+          res.json({ error: 'No valid refresh token. Please re-authenticate using the following URL.', authUrl: authUrl });
           return;
-        }        
+        }
       }
 
       const rawArgs = req.body;
