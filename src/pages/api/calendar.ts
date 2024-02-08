@@ -99,11 +99,13 @@ app.use(async (req: Request, res: Response) => {
 
         // 返回成功消息
         res.json({ message: 'Authentication successful' });
+        res.redirect('/auth_s.html');
         return;
       }
 
       // 如果没有授权码，返回错误
       res.status(400).json({ error: 'Authorization code missing' });
+      res.redirect('/auth_f.html');
       return;
 
     } else if (req.method === 'POST') {
@@ -112,7 +114,7 @@ app.use(async (req: Request, res: Response) => {
       const userId = calendarUserId;      
  
       let session = await sessionManager.getSession(userId);
-      console.log(`session:`, await session);
+      // console.log(`session:`, await session);
 
       if (!session) {
         // 会话不存在，生成跳转认证URL
@@ -124,10 +126,10 @@ app.use(async (req: Request, res: Response) => {
 
       if (!session || !session.accessToken || new Date() > new Date(session.createdAt.getTime() + ((session.expiresIn || 0) * 1000))) {
         // ... 其他代码 ...
-        console.log(`333333, refreshToken:`, session.refreshToken);
+        // console.log(`333333, refreshToken:`, session.refreshToken);
         if (session && session.refreshToken) {
           try {
-            console.log(`try refesh:`, session.refreshToken);
+            // console.log(`try refesh:`, session.refreshToken);
             // 使用 Google Auth Library 刷新令牌
             authClient.setCredentials({
               refresh_token: session.refreshToken
@@ -153,9 +155,9 @@ app.use(async (req: Request, res: Response) => {
           }
         } else {
           // 如果没有有效的刷新令牌，需要重新授权
-          console.log(`无有效令牌，需要重新授权`, session.refreshToken);
+          // console.log(`无有效令牌，需要重新授权`, session.refreshToken);
           const authUrl = buildAuthUrl();
-          console.log(`authUrl`, authUrl);
+          // console.log(`authUrl`, authUrl);
           res.json({ authUrl: authUrl });
           return;
         }        
