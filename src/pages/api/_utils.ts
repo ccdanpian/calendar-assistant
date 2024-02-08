@@ -171,7 +171,7 @@ interface Calendar {
 }
 
 async function ensureCalendarExists(client: any, calendarName: string): Promise<string> {
-  let calendarId: string | null = null;
+  let calendarId: string | undefined;
 
   try {
     const calendarsList = await client.calendarList.list();
@@ -248,15 +248,10 @@ export async function runner(rawArgs: any, userId: string) {
       default:
         throw new Error('Invalid action');
     }
-  } catch (error: unknown) {  // 注意这里使用unknown类型
-    let errorMessage: string;
-    if (error instanceof Error) {
-      errorMessage = error.message; // TypeScript知道这是一个Error
-    } else {
-      errorMessage = String(error); // 处理非Error类型的错误信息
-    }
-
-    console.error('Error in runner:', errorMessage);
+  } catch (error: unknown) {
+  // 使用三元表达式简化的错误消息分配
+    const errorMessage: string = error instanceof Error ? error.message : String(error);
+    console.error('Error in runner:', errorMessage); // 记录错误信息
 
     // 根据错误消息内容判断是否为授权错误
     if (errorMessage.includes('Unauthorized') || errorMessage.includes('Invalid credentials')) {
