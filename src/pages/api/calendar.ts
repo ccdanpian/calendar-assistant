@@ -192,26 +192,34 @@ app.use(async (req: Request, res: Response) => {
     } else {
       res.status(405).json({ error: 'Method not allowed' });
     }
-  } catch (error) {
-    // 使用类型守卫来确定error是一个Error对象
-    if (error instanceof Error) {
-      // 现在TypeScript知道error是一个Error对象，我们可以安全访问message和stack属性
-      if (error.message.includes('Unauthorized') || error.message.includes('Invalid credentials')) {
-        // 处理授权错误
-        console.error('Authorization error:', error);
-        const authUrl = buildAuthUrl();
-        res.status(401).json({ authUrl: authUrl, error: 'Authorization required. Please re-authenticate.' });
-      } else {
-        // 处理其他错误
-        console.error('Error:', error);
-        res.status(500).json({ error: error.message, stack: error.stack });
-      }
-    } else {
-      // 未知类型的错误，它可能不是一个Error对象
-      console.error('Unknown error:', error);
-      res.status(500).json({ error: "An unknown error occurred" });
-    }
-  }
+  } catch (error: unknown) {
+            // 使用类型断言来处理
+            const axiosError = error as { response: { data: { error: string } } | undefined };
+            console.error('############', error);
+          
+            if (axiosError.response && (axiosError.response.data.error === 'Invalid Credentials' || axiosError.response.data.error === 'invalid_grant')) {
+              // 对'invalid_grant'错误特殊处理
+              console.log('*****************');
+              console.error('Token has been expired or revoked. Please re-authenticate using the following URL:', error);
+              const authUrl = buildAuthUrl();
+              res.json({ authUrl: authUrl });
+            } else if (axiosError.response) {
+              // 处理其他类型的HTTP响应错误
+              console.log('88888888888888888888');
+              console.error('Error refreshing token:', axiosError.response.data);
+              res.status(401).json({ error: 'Failed to refresh token' });
+            } else if (error instanceof Error) {
+              // 处理标准错误对象
+              console.log('%%%%%%%%%%%%%%%%%%%%%');
+              console.error('Error refreshing token:', error.message);
+              res.status(401).json({ error: error.message });
+            } else {
+              // 处理未知类型错误
+              console.error('An unknown error occurred while refreshing token:', error);
+              res.status(401).json({ error: 'An unknown error occurred while refreshing token' });
+            }
+            return;
+          }
 });
 
 module.exports = app;
