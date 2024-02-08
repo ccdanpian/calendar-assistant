@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Authentication Failed</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        font-family: Arial, sans-serif;
+      }
+      .button {
+        margin-top: 20px;
+        padding: 10px 15px;
+        font-size: 16px;
+      }
+      .revoke {
+        position: absolute;
+        bottom: 20px;
+        text-align: center;
+        width: 100%;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Authentication Failed</h2>
+    <p>There was a problem authenticating with Google. Please close this page and try again.</p>
+    <button class="button" onclick="closeWindow()">Close this page</button>
+    <script>
+      function closeWindow() {
+        if (window.openedWithScript) {
+          window.close();
+        } else {
+          alert('Please close this window manually.');
+        }
+      }
+    </script>
+  </body>
+</html>
