@@ -249,18 +249,14 @@ export async function runner(rawArgs: any, userId: string) {
         throw new Error('Invalid action');
     }
   } catch (error: unknown) {
-  // 使用三元表达式简化的错误消息分配
+    // 使用三元表达式简化的错误消息分配
     const errorMessage: string = error instanceof Error ? error.message : String(error);
     console.error('Error in runner:', errorMessage); // 记录错误信息
-
-    // 根据错误消息内容判断是否为授权错误
-    if (errorMessage.includes('Unauthorized') || errorMessage.includes('Invalid credentials')) {
-      // 直接抛出一个特定的错误消息
-      throw new Error('Unauthorized: Invalid credentials. Please re-authenticate.');
-    } else {
-      // 抛出其他类型的错误
-      throw error;
-    }
+  
+    // 使用三元表达式简化的授权错误检查和抛出异常
+    throw errorMessage.includes('Unauthorized') || errorMessage.includes('Invalid credentials')
+      ? new Error('Unauthorized: Invalid credentials. Please re-authenticate.')
+      : new Error(errorMessage);
   }
-}
+} 
 export default runner;
