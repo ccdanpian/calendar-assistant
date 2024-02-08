@@ -98,13 +98,13 @@ app.use(async (req: Request, res: Response) => {
 
 
         // 返回成功消息
-        res.json({ message: 'Authentication successful' });
+        // res.json({ message: 'Authentication successful' });
         res.redirect('/auth_s.html');
         return;
       }
 
       // 如果没有授权码，返回错误
-      res.status(400).json({ error: 'Authorization code missing' });
+      // res.status(400).json({ error: 'Authorization code missing' });
       res.redirect('/auth_f.html');
       return;
 
