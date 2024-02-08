@@ -248,16 +248,24 @@ export async function runner(rawArgs: any, userId: string) {
       default:
         throw new Error('Invalid action');
     }
-  } catch (error) {
-    // 检测授权错误
-    if (error.response && error.response.status === 401) {
-      // 如果确认是授权错误，直接抛出一个特定的错误消息
-      throw new Error('Unauthorized: Invalid credentials. Please re-authenticate.');
+  } catch (error: unknown) {  // 注意这里使用unknown类型
+    let errorMessage: string;
+    if (error instanceof Error) {
+      errorMessage = error.message; // TypeScript知道这是一个Error
+    } else {
+      errorMessage = String(error); // 处理非Error类型的错误信息
     }
-    
-    // 处理其他类型的错误
-    console.error('Error in runner:', error);
-    throw error;
+
+    console.error('Error in runner:', errorMessage);
+
+    // 根据错误消息内容判断是否为授权错误
+    if (errorMessage.includes('Unauthorized') || errorMessage.includes('Invalid credentials')) {
+      // 直接抛出一个特定的错误消息
+      throw new Error('Unauthorized: Invalid credentials. Please re-authenticate.');
+    } else {
+      // 抛出其他类型的错误
+      throw error;
+    }
   }
 }
 export default runner;
