@@ -163,6 +163,8 @@ app.use(async (req: Request, res: Response) => {
               console.log('88888888888888888888');
               console.error('Error refreshing token:', axiosError.response.data);
               res.status(401).json({ error: 'Failed to refresh token' });
+              const authUrl = buildAuthUrl();
+              res.json({ authUrl: authUrl });
             } else if (error instanceof Error) {
               // 处理标准错误对象
               console.log('%%%%%%%%%%%%%%%%%%%%%');
@@ -205,9 +207,11 @@ app.use(async (req: Request, res: Response) => {
               res.json({ authUrl: authUrl });
             } else if (axiosError.response) {
               // 处理其他类型的HTTP响应错误
-              console.log('88888888888888888888');
+              console.log('00000000000008');
               console.error('Error refreshing token:', axiosError.response.data);
               res.status(401).json({ error: 'Failed to refresh token' });
+              const authUrl = buildAuthUrl();
+              res.json({ authUrl: authUrl });
             } else if (error instanceof Error) {
               // 处理标准错误对象
               console.log('%%%%%%%%%%%%%%%%%%%%%');
