@@ -112,7 +112,6 @@ async function listEvents(client: any, calendarId: any, searchParams: any) {
         // 使用.format('YYYY-MM-DD, HH:mm:ss')来分开日期和时间
         const startDateTimeLocal = event.start.dateTime ? moment(event.start.dateTime).tz(event.start.timeZone || 'UTC').format('YYYY-MM-DD, HH:mm:ss') : '';
         const endDateTimeLocal = event.end.dateTime ? moment(event.end.dateTime).tz(event.end.timeZone || 'UTC').format('YYYY-MM-DD, HH:mm:ss') : '';
-});
 
         // 更新事件对象的时间信息
         return {
