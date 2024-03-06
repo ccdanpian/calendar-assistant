@@ -45,7 +45,7 @@
   "identifier": "calendar-assistant",
   "meta": {
     "avatar": "📅",
-    "tags": ["calendar", "assistant", "schedule"],
+    "tags": ["calendar", "schedule"],
     "title": "Calendar Assistant",
     "description": "A plugin to manage your calendar events"
   },
@@ -55,7 +55,7 @@
     "properties": {
       "CALENDAR_KEY": {
         "title": "Calendar User Key",
-        "description": "we use Google Calendar API as backend service [Learn more](https://github.com/lobehub/chat-plugin-search-engine)",
+        "description": "通过google辅助日历进行日程管理，为了账号安全，请设置一个初始密码",
         "type": "string",
         "minLength": 6,
         "maxLength": 64,
