@@ -4,7 +4,7 @@
     {
       "url": "https://www.ccalendar.space/api/calendar",
       "name": "manageEvents",
-      "description": "管理用户的日程事件，包括添加、查询、更新和删除，并给出日历地址",
+      "description": "管理用户的日程事件，包括添加、查询、更新和删除，并给出日历地址；建议搭配日程助手一起使用",
       "parameters": {
         "properties": {
           "action": {
